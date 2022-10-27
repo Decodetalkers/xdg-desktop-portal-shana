@@ -1,0 +1,13 @@
+[package]
+name = "filedialogshana"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+slint = "0.3.0"
+gio = "0.15.12"
+shanatypes = { path = "../shanatypes" }
+[build-dependencies]
+slint-build = "0.3"
