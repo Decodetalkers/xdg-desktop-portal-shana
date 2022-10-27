@@ -1,10 +1,10 @@
-use filechoosertypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
+use shanatypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{error::Error, future::pending};
 use tracing::{info, Level};
 use tracing_subscriber;
 use zbus::{dbus_interface, zvariant::ObjectPath, ConnectionBuilder};
 struct Shana;
-mod filechoosertypes;
+//mod filechoosertypes;
 #[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
 impl Shana {
     async fn open_file(

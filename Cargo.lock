@@ -2711,6 +2711,13 @@ checksum = "ae1a47186c03a32177042e55dbc5fd5aee900b8e0069a8d70fba96a9375cd012"
 [[package]]
 name = "shanatypes"
 version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_repr",
+ "tokio",
+ "url",
+ "zbus 2.3.2",
+]
 
 [[package]]
 name = "sharded-slab"
@@ -3772,12 +3779,10 @@ version = "0.1.0"
 dependencies = [
  "filedialogshana",
  "serde",
- "serde_repr",
  "shanatypes",
  "tokio",
  "tracing",
  "tracing-subscriber",
- "url",
  "zbus 2.3.2",
 ]
 
