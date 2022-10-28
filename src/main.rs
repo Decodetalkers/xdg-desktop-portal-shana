@@ -1,3 +1,4 @@
+use filedialogshana::choose_file;
 use shanatypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{error::Error, future::pending};
 use tracing::{info, Level};
@@ -20,13 +21,7 @@ impl Shana {
         println!("parent_window is {}", parent_window);
         println!("title is {}", title);
         println!("options is {:?}", options);
-        (
-            0,
-            SelectedFiles {
-                uris: vec![],
-                choices: None,
-            },
-        )
+        choose_file()
     }
 
     async fn save_file(

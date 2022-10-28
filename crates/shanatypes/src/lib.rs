@@ -25,11 +25,11 @@ pub struct FileFilter(String, Vec<(FilterType, String)>);
 #[derive(SerializeDict, DeserializeDict, Type, Debug)]
 #[zvariant(signature = "dict")]
 pub struct OpenFileOptions {
-    accept_label: Option<String>, // String
+    accept_label: Option<String>, // WindowTitle
     modal: Option<bool>,          // bool
     multiple: Option<bool>,       // bool
     directory: Option<bool>,
-    filters: Vec<FileFilter>,
+    filters: Vec<FileFilter>, // Filter
     current_filter: Option<FilterType>,
     choices: Vec<Choice>,
 }
