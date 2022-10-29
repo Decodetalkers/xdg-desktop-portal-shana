@@ -40,6 +40,9 @@ impl FileFilter {
     pub fn get_filters(&self) -> Vec<(FilterType, String)> {
         self.1.clone()
     }
+    pub fn get_name(&self) -> String {
+        self.0.clone()
+    }
 }
 
 // filters contains all filters can only can select one at one time

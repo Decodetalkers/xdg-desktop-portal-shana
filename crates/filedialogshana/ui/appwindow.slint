@@ -1,4 +1,4 @@
-import { Button, VerticalBox , HorizontalBox, ScrollView} from "std-widgets.slint";
+import { Button, VerticalBox , HorizontalBox, ScrollView, GroupBox, ComboBox} from "std-widgets.slint";
 
 export struct FileUnit := {
     name: string,
@@ -12,46 +12,75 @@ export struct FileUnit := {
 export global GlobalFiles := {
     property <[FileUnit]> left: [];
     property <[FileUnit]> right: [];
+    property <[string]> filiter :[];
+    property <string> current-path: "" ;
     property <bool> is_select_fold: false ;
+    property <int> current-filiter:-1 ;
 }
 
 export AppWindow := Window {
     property <string> m_title : "" ;
-    property<int> counter: 42;
+    property <int> counter: 42;
     callback select_file();
     callback cancel_selected();
+    callback change_filiter(int,int);
     title <=> m_title;
-    VerticalBox {
-        HorizontalBox { 
-            ScrollView { 
-                VerticalBox { 
-                    for unit in  GlobalFiles.left : Button { 
-                        text: unit.name;
+    HorizontalBox {
+        VerticalBox {
+            max-width: 300px;
+            GroupBox { 
+                title: "Filiter";
+                filitermode := ComboBox {
+                    model <=> GlobalFiles.filiter;
+                    current-index <=> GlobalFiles.current-filiter;
+                    selected => {
+                        change-filiter(current-index,showmode.current-index);
                     }
                 }
             }
-            ScrollView { 
-                VerticalBox { 
-                    for unit in  GlobalFiles.left : Button { 
-                        text: unit.name;
+            GroupBox { 
+                title: "Show";
+                showmode := ComboBox { 
+                    model: ["visible", "all","onlyHidden"];
+                    current-index: 0;
+                    selected => { 
+                        change-filiter(filitermode.current-index,current-index);
                     }
                 }
             }
         }
-        HorizontalBox { 
-            alignment: end;
-            Button {
-                text: "Select";
-                clicked => { 
-                    select-file();
+        VerticalBox {
+            HorizontalBox {
+                ScrollView {
+                    VerticalBox { 
+                        for unit in  GlobalFiles.left : Button { 
+                            text: unit.name;
+                        }
+                    }
+                }
+                ScrollView { 
+                    VerticalBox { 
+                        for unit in  GlobalFiles.left : Button { 
+                            text: unit.name;
+                        }
+                    }
                 }
             }
-            Button {
-                text: "Cancel";
-                clicked => { 
-                    cancel-selected();
+            HorizontalBox {
+                alignment: end;
+                Button {
+                    text: "Select";
+                    clicked => { 
+                        select-file();
+                    }
+                }
+                Button {
+                    text: "Cancel";
+                    clicked => { 
+                        cancel-selected();
+                    }
                 }
             }
         }
-     }
+    }
 }
