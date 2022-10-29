@@ -1,16 +1,54 @@
-import { Button, VerticalBox } from "std-widgets.slint";
+import { Button, VerticalBox , HorizontalBox, ScrollView} from "std-widgets.slint";
+
+export struct FileUnit := {
+    name: string,
+    owner: string,
+    is_fold: bool,
+    permission: int,
+    file_path: string,
+    mimetype: string,
+}
+
+export global GlobalFiles := {
+    property <[FileUnit]> left: [];
+    property <[FileUnit]> right: [];
+    property <bool> is_select_fold: false ;
+}
 
 export AppWindow := Window {
     property<int> counter: 42;
-    callback request-increase-value();
-    VerticalBox { 
-        Text {
-            text: "Counter: \{counter}";
+    callback select_file();
+    callback cancel_selected();
+    VerticalBox {
+        HorizontalBox { 
+            ScrollView { 
+                VerticalBox { 
+                    for unit in  GlobalFiles.left : Button { 
+                        text: unit.name;
+                    }
+                }
+            }
+            ScrollView { 
+                VerticalBox { 
+                    for unit in  GlobalFiles.left : Button { 
+                        text: unit.name;
+                    }
+                }
+            }
         }
-        Button {
-            text: "Increase value";
-            clicked => { 
-                request-increase-value();
+        HorizontalBox { 
+            alignment: end;
+            Button {
+                text: "Select";
+                clicked => { 
+                    select-file();
+                }
+            }
+            Button {
+                text: "Cancel";
+                clicked => { 
+                    cancel-selected();
+                }
             }
         }
      }

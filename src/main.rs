@@ -2,7 +2,6 @@ use filedialogshana::choose_file;
 use shanatypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{error::Error, future::pending};
 use tracing::{info, Level};
-use tracing_subscriber;
 use zbus::{dbus_interface, zvariant::ObjectPath, ConnectionBuilder};
 struct Shana;
 //mod filechoosertypes;
