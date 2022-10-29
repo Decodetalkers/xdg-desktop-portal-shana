@@ -1,5 +1,6 @@
 use glob::Pattern;
 use once_cell::sync::Lazy;
+use shanatypes::{FileFilter, FilterType};
 use std::os::unix::fs::MetadataExt;
 use std::path::Path;
 pub static HOME: Lazy<String> = Lazy::new(|| std::env::var("HOME").unwrap());
@@ -131,7 +132,11 @@ fn file_readable(dir: impl AsRef<Path>) -> bool {
     }
 }
 
-pub fn get_files_from_folder(dir: impl AsRef<Path>, howshow: ShowHow) -> Vec<FileType> {
+pub fn get_files_from_folder(
+    dir: impl AsRef<Path>,
+    howshow: ShowHow,
+    filiters: Option<Vec<FileFilter>>,
+) -> Vec<FileType> {
     if dir.as_ref().is_dir() && folder_enterable(&dir) {
         let entry = std::fs::read_dir(dir).unwrap().flatten();
         entry
@@ -171,11 +176,25 @@ pub fn get_files_from_folder(dir: impl AsRef<Path>, howshow: ShowHow) -> Vec<Fil
                     }
                 }
             })
-            .filter(|output| {
-                match howshow {
-                    ShowHow::ShowHidden => true,
-                    ShowHow::OnlyHidden => output.is_hidden(),
-                    ShowHow::OnlyVisible => !output.is_hidden(),
+            .filter(|output| match howshow {
+                ShowHow::ShowHidden => true,
+                ShowHow::OnlyHidden => output.is_hidden(),
+                ShowHow::OnlyVisible => !output.is_hidden(),
+            })
+            .filter(|output| match &filiters {
+                None => true,
+                Some(filters) => {
+                    for filter in filters {
+                        for fil in filter.get_filters() {
+                            if !match fil.0 {
+                                FilterType::MimeType => output.is_mimetype(&fil.1),
+                                FilterType::GlobPattern => output.is_glob(&fil.1),
+                            } {
+                                return false;
+                            }
+                        }
+                    }
+                    true
                 }
             })
             .collect()

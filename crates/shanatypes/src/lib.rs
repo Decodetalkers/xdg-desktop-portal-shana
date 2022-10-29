@@ -36,17 +36,54 @@ pub enum FilterType {
 #[derive(Clone, Serialize, Deserialize, Type, Debug)]
 pub struct FileFilter(String, Vec<(FilterType, String)>);
 
+impl FileFilter {
+    pub fn get_filters(&self) -> Vec<(FilterType, String)> {
+        self.1.clone()
+    }
+}
+
 // filters contains all filters can only can select one at one time
 #[derive(SerializeDict, DeserializeDict, Type, Debug)]
 #[zvariant(signature = "dict")]
 pub struct OpenFileOptions {
-    pub accept_label: Option<String>, // WindowTitle
+    accept_label: Option<String>, // WindowTitle
     modal: Option<bool>,              // bool
     multiple: Option<bool>,           // bool
-    pub directory: Option<bool>,
-    pub filters: Vec<FileFilter>, // Filter
-    pub current_filter: Option<FileFilter>,
+    directory: Option<bool>,
+    filters: Vec<FileFilter>, // Filter
+    current_filter: Option<FileFilter>,
     choices: Vec<Choice>,
+}
+
+impl OpenFileOptions {
+    pub fn select_function(&self) -> SelectFunction {
+        if let Some(true) = self.directory {
+            SelectFunction::Folder {
+                title: self.accept_label.clone().unwrap_or("OpenFold".to_string()),
+                filters: self.filters.clone(),
+                current_filter: self.current_filter.clone(),
+            }
+        } else {
+            SelectFunction::File {
+                title: self.accept_label.clone().unwrap_or("OpenFile".to_string()),
+                filters: self.filters.clone(),
+                current_filter: self.current_filter.clone(),
+            }
+        }
+    }
+}
+
+pub enum SelectFunction {
+    File {
+        title: String,
+        filters: Vec<FileFilter>,
+        current_filter: Option<FileFilter>,
+    },
+    Folder {
+        title: String,
+        filters: Vec<FileFilter>,
+        current_filter: Option<FileFilter>,
+    },
 }
 
 // filters contains all filters can only can select one at one time

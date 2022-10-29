@@ -20,7 +20,8 @@ impl Shana {
         println!("parent_window is {}", parent_window);
         println!("title is {}", title);
         println!("options is {:?}", options);
-        choose_file()
+        let selected = options.select_function();
+        choose_file(selected)
     }
 
     async fn save_file(

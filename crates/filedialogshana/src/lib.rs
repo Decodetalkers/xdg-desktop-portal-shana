@@ -2,18 +2,35 @@ mod io_file;
 slint::include_modules!();
 use io_file::ShowHow;
 use io_file::*;
-use shanatypes::SelectedFiles;
+use shanatypes::{SelectFunction, SelectedFiles};
 use slint::VecModel;
 use std::sync::mpsc;
 // 0 is succeed , 1 is cancel , 2 is other
-pub fn choose_file() -> (u32, SelectedFiles) {
+pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
+    let (title, filters, default_filter, isfold) = match messages {
+        SelectFunction::File {
+            title,
+            filters,
+            current_filter,
+        } => (title, filters, current_filter, false),
+        SelectFunction::Folder {
+            title,
+            filters,
+            current_filter,
+        } => (title, filters, current_filter, true),
+    };
+    let defaultfiliter = match default_filter {
+        Some(filiter) => Some(vec![filiter]),
+        None => None,
+    };
     let (stdout_tx, stdout_rs) = mpsc::channel();
     let stdout_tx_cancel = stdout_tx.clone();
     let ui = AppWindow::new();
+    ui.set_m_title(title.into());
     let globalfiles = GlobalFiles::get(&ui);
     globalfiles.set_left(
         std::rc::Rc::new(VecModel::from(
-            get_files_from_folder((*HOME).to_string(), ShowHow::OnlyVisible)
+            get_files_from_folder((*HOME).to_string(), ShowHow::OnlyVisible, defaultfiliter)
                 .into_iter()
                 .map(|file| match file {
                     FileType::File {

@@ -16,9 +16,11 @@ export global GlobalFiles := {
 }
 
 export AppWindow := Window {
+    property <string> m_title : "" ;
     property<int> counter: 42;
     callback select_file();
     callback cancel_selected();
+    title <=> m_title;
     VerticalBox {
         HorizontalBox { 
             ScrollView { 
