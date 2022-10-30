@@ -1,4 +1,4 @@
-import { Button, VerticalBox , HorizontalBox, ScrollView, GroupBox, ComboBox, ListView, CheckBox} from "std-widgets.slint";
+import {StandardListView, Button, VerticalBox , HorizontalBox, ScrollView, GroupBox, ComboBox, ListView, CheckBox} from "std-widgets.slint";
 
 import {FileUnit, GlobalFiles} from "global.slint";
 
@@ -128,10 +128,21 @@ export AppWindow := Window {
                                         font-weight: 10;
                                         font-size: 20px;
                                     }
-                                    Text { 
-                                        text: unit.owner;
-                                        font-weight: 1;
-                                        font-size: 10px;
+                                    HorizontalBox {
+                                        Text { 
+                                            text: unit.owner;
+                                            font-weight: 1;
+                                            font-size: 15px;
+                                        }
+                                        if !unit.is_fold : Rectangle { 
+                                            background: pink;
+                                            border-radius: 15px;
+                                            width: 98px;
+                                            height: 20px;
+                                            Text { 
+                                                text: "  \{unit.mimetype}"; 
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -167,16 +178,16 @@ export AppWindow := Window {
                                     left.viewport-y = 0;
                                 } else {
                                     left.selected += 1;
-                                    left.viewport-y = -1 *left.selected * 78px;
+                                    left.viewport-y = -1 *left.selected * 98px;
                                 }
                             }
                             if (event.text == Keys.UpArrow) {
                                 if (left.selected <= 0 ) {
                                     left.selected = GlobalFiles.left.length - 1;
-                                    left.viewport-y = -1 * (GlobalFiles.left.length - 1) * 78px;
+                                    left.viewport-y = -1 * (GlobalFiles.left.length - 1) * 98px;
                                 } else {
                                     left.selected -= 1;
-                                    left.viewport-y = -1 * left.selected * 78px;
+                                    left.viewport-y = -1 * left.selected * 98px;
                                 }
                             }
                             if (event.text == Keys.Return && GlobalFiles.left[left.selected].permission == 1) {
@@ -236,10 +247,21 @@ export AppWindow := Window {
                                         font-weight: 10;
                                         font-size: 20px;
                                     }
-                                    Text { 
-                                        text: unit.owner;
-                                        font-weight: 1;
-                                        font-size: 10px;
+                                    HorizontalBox {
+                                        Text { 
+                                            text: unit.owner;
+                                            font-weight: 1;
+                                            font-size: 15px;
+                                        }
+                                        if !unit.is_fold : Rectangle { 
+                                            background: pink;
+                                            border-radius: 15px;
+                                            width: 98px;
+                                            height: 20px;
+                                            Text { 
+                                                text: "  \{unit.mimetype}"; 
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -254,16 +276,16 @@ export AppWindow := Window {
                                     right.viewport-y = 0;
                                 } else {
                                     right.selected += 1;
-                                    right.viewport-y = -1 *right.selected * 78px;
+                                    right.viewport-y = -1 *right.selected * 98px;
                                 }
                             }
                             if (event.text == Keys.UpArrow) {
                                 if (right.selected <= 0) {
                                     right.selected = GlobalFiles.right.length - 1;
-                                    right.viewport-y = -1 * (GlobalFiles.right.length - 1) * 78px;
+                                    right.viewport-y = -1 * (GlobalFiles.right.length - 1) * 98px;
                                 } else {
                                     right.selected -= 1;
-                                    right.viewport-y = -1 * right.selected * 78px;
+                                    right.viewport-y = -1 * right.selected * 98px;
                                 }
                             }
 
