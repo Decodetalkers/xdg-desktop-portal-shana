@@ -2,9 +2,11 @@ mod io_file;
 slint::include_modules!();
 use io_file::ShowHow;
 use io_file::*;
-use shanatypes::{SelectFunction, SelectedFiles};
+use slint::Model;
+
+use shanatypes::{FileFilter, SelectFunction, SelectedFiles};
 use slint::VecModel;
-use std::sync::mpsc;
+use std::{path::Path, sync::mpsc};
 // 0 is succeed , 1 is cancel , 2 is other
 pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
     let (title, filters, default_filter, isfold) = match messages {
@@ -46,11 +48,16 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
         std::rc::Rc::new(VecModel::from(
             filters
                 .iter()
-                .map(|unit| unit.get_name().into())
-                .collect::<Vec<slint::SharedString>>(),
+                .enumerate()
+                .map(|(index, unit)| FilterFun {
+                    filiter: unit.get_name().into(),
+                    selected: current_index == index as i32,
+                })
+                .collect::<Vec<FilterFun>>(),
         ))
         .into(),
     );
+    globalfiles.set_is_select_fold(isfold);
     globalfiles.set_current_path((*HOME).clone().into());
     globalfiles.set_current_filiter(current_index);
     globalfiles.set_left(
@@ -78,6 +85,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                             (true, true) => 3,
                         },
                         file_path: filepath.into(),
+                        beselected: false,
                     },
                     FileType::Folder {
                         name,
@@ -92,19 +100,37 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                         mimetype: "".into(),
                         permission: if viewable { 1 } else { 0 },
                         file_path: filepath.into(),
+                        beselected: false,
                     },
                 })
                 .collect::<Vec<FileUnit>>(),
         ))
         .into(),
     );
+    let ui_handle = ui.as_weak();
+    ui.on_change_superpath(move || {
+        let ui = ui_handle.unwrap();
+        let globalfiles = GlobalFiles::get(&ui);
+        let current_path = globalfiles.get_current_path().to_string();
+        let path = Path::new(&current_path);
+        if let Some(path) = path.parent() {
+            globalfiles.set_current_path(path.to_str().unwrap().into());
+        }
+    });
+    let ui_handle = ui.as_weak();
     ui.on_select_file(move || {
+        let ui = ui_handle.unwrap();
+        let globalfiles = GlobalFiles::get(&ui);
+        let left = globalfiles.get_left();
+        let selected = left
+            .iter()
+            .filter(|unit| unit.beselected)
+            .map(|unit| unit.file_path.to_string())
+            .collect();
+        let selectfiles = SelectedFiles::from_path(selected);
         let _ = stdout_tx.send((
             0,
-            SelectedFiles {
-                uris: vec![],
-                choices: None,
-            },
+            selectfiles,
         ));
         let _ = slint::quit_event_loop();
     });
@@ -119,63 +145,119 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
         let _ = slint::quit_event_loop();
     });
     let ui_handle = ui.as_weak();
-    ui.on_change_filiter(move |index, howtoshow| {
+    ui.on_change_filiter(move |howtoshow, find_path, side| {
         let ui = ui_handle.unwrap();
         let globalfiles = GlobalFiles::get(&ui);
+        let filiters = globalfiles.get_filiter().to_owned();
         let showmod = match howtoshow {
             0 => ShowHow::OnlyVisible,
             1 => ShowHow::ShowHidden,
-            _ => ShowHow::OnlyHidden,
+            2 => ShowHow::OnlyHidden,
+            3 => ShowHow::OnlyFile,
+            _ => ShowHow::OnlyFolder,
         };
-        globalfiles.set_left(
-            std::rc::Rc::new(VecModel::from(
-                get_files_from_folder(
-                    globalfiles.get_current_path().to_string(),
-                    showmod,
-                    Some(vec![filters_forset[index as usize].clone()]),
-                )
-                .into_iter()
-                .map(|file| match file {
-                    FileType::File {
-                        name,
-                        owner,
-                        readable,
-                        runable,
-                        filepath,
-                        mimetype,
-                        ..
-                    } => FileUnit {
-                        name: name.into(),
-                        owner: owner.into(),
-                        is_fold: false,
-                        mimetype: mimetype.into(),
-                        permission: match (readable, runable) {
-                            (false, false) => 0,
-                            (true, false) => 1,
-                            (false, true) => 2,
-                            (true, true) => 3,
-                        },
-                        file_path: filepath.into(),
-                    },
-                    FileType::Folder {
-                        name,
-                        owner,
-                        viewable,
-                        filepath,
-                        ..
-                    } => FileUnit {
-                        name: name.into(),
-                        owner: owner.into(),
-                        is_fold: true,
-                        mimetype: "".into(),
-                        permission: if viewable { 1 } else { 0 },
-                        file_path: filepath.into(),
-                    },
-                })
-                .collect::<Vec<FileUnit>>(),
-            ))
-            .into(),
-        );
+        let filiter = filiters.iter().collect::<Vec<FilterFun>>();
+        let toselected = std::iter::zip(filiter, filters_forset.clone())
+            .filter(|(filiter, _)| filiter.selected)
+            .map(|(_, filiter)| filiter)
+            .collect::<Vec<FileFilter>>();
+        if side == 0 {
+            globalfiles.set_left(
+                std::rc::Rc::new(VecModel::from(
+                    get_files_from_folder(find_path.to_string(), showmod, Some(toselected))
+                        .into_iter()
+                        .map(|file| match file {
+                            FileType::File {
+                                name,
+                                owner,
+                                readable,
+                                runable,
+                                filepath,
+                                mimetype,
+                                ..
+                            } => FileUnit {
+                                name: name.into(),
+                                owner: owner.into(),
+                                is_fold: false,
+                                mimetype: mimetype.into(),
+                                permission: match (readable, runable) {
+                                    (false, false) => 0,
+                                    (true, false) => 1,
+                                    (false, true) => 2,
+                                    (true, true) => 3,
+                                },
+                                file_path: filepath.into(),
+                                beselected: false,
+                            },
+                            FileType::Folder {
+                                name,
+                                owner,
+                                viewable,
+                                filepath,
+                                ..
+                            } => FileUnit {
+                                name: name.into(),
+                                owner: owner.into(),
+                                is_fold: true,
+                                mimetype: "".into(),
+                                permission: if viewable { 1 } else { 0 },
+                                file_path: filepath.into(),
+                                beselected: false,
+                            },
+                        })
+                        .collect::<Vec<FileUnit>>(),
+                ))
+                .into(),
+            );
+        } else {
+            globalfiles.set_right(
+                std::rc::Rc::new(VecModel::from(
+                    get_files_from_folder(find_path.to_string(), showmod, Some(toselected))
+                        .into_iter()
+                        .map(|file| match file {
+                            FileType::File {
+                                name,
+                                owner,
+                                readable,
+                                runable,
+                                filepath,
+                                mimetype,
+                                ..
+                            } => FileUnit {
+                                name: name.into(),
+                                owner: owner.into(),
+                                is_fold: false,
+                                mimetype: mimetype.into(),
+                                permission: match (readable, runable) {
+                                    (false, false) => 0,
+                                    (true, false) => 1,
+                                    (false, true) => 2,
+                                    (true, true) => 3,
+                                },
+                                file_path: filepath.into(),
+                                beselected: false,
+                            },
+                            FileType::Folder {
+                                name,
+                                owner,
+                                viewable,
+                                filepath,
+                                ..
+                            } => FileUnit {
+                                name: name.into(),
+                                owner: owner.into(),
+                                is_fold: true,
+                                mimetype: "".into(),
+                                permission: if viewable { 1 } else { 0 },
+                                file_path: filepath.into(),
+                                beselected: false,
+                            },
+                        })
+                        .collect::<Vec<FileUnit>>(),
+                ))
+                .into(),
+            );
+        }
     });
     ui.run();
     if let Ok(output) = stdout_rs.recv_timeout(std::time::Duration::from_nanos(300)) {

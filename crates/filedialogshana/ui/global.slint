@@ -1,0 +1,25 @@
+export struct FileUnit := {
+    name: string,
+    owner: string,
+    is_fold: bool,
+    permission: int,
+    file_path: string,
+    mimetype: string,
+    beselected: bool,
+}
+
+export struct FilterFun := {
+    filiter : string,
+    selected: bool,
+}
+
+export global GlobalFiles := {
+    property <[FileUnit]> left: [];
+    property <[FileUnit]> right: [];
+    property <[FilterFun]> filiter :[];
+    property <bool> signalfile: false;
+    property <int> last-selected: -1 ;
+    property <string> current-path: "" ;
+    property <bool> is_select_fold: false ;
+    property <int> current-filiter:-1 ;
+}

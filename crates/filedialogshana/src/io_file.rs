@@ -20,6 +20,8 @@ pub enum ShowHow {
     OnlyVisible,
     ShowHidden,
     OnlyHidden,
+    OnlyFolder,
+    OnlyFile,
 }
 
 pub enum FileType {
@@ -61,6 +63,12 @@ impl FileType {
         match self {
             Self::File { hidden, .. } => *hidden,
             Self::Folder { hidden, .. } => *hidden,
+        }
+    }
+    fn is_folder(&self) -> bool {
+        match self {
+            Self::File { .. } => false,
+            Self::Folder { .. } => true,
         }
     }
 }
@@ -138,7 +146,12 @@ pub fn get_files_from_folder(
     filiters: Option<Vec<FileFilter>>,
 ) -> Vec<FileType> {
     if dir.as_ref().is_dir() && folder_enterable(&dir) {
-        let entry = std::fs::read_dir(dir).unwrap().flatten();
+        let entry = {
+            match std::fs::read_dir(dir) {
+                Ok(dir) => dir.flatten(),
+                Err(_) => return Vec::new(),
+            }
+        };
         entry
             .into_iter()
             .map(|fileunit| {
@@ -180,6 +193,8 @@ pub fn get_files_from_folder(
                 ShowHow::ShowHidden => true,
                 ShowHow::OnlyHidden => output.is_hidden(),
                 ShowHow::OnlyVisible => !output.is_hidden(),
+                ShowHow::OnlyFile => !output.is_folder(),
+                ShowHow::OnlyFolder => output.is_folder(),
             })
             .filter(|output| match &filiters {
                 None => true,
