@@ -6,11 +6,17 @@ export struct FileUnit := {
     file_path: string,
     mimetype: string,
     beselected: bool,
+    image: image,
+    sourcetype: int,
 }
 
 export struct FilterFun := {
     filiter : string,
     selected: bool,
+}
+
+export global DefaultAsserts := {
+    property <image> fileicon : @image-url("../assert/revolution.png");
 }
 
 export global GlobalFiles := {
@@ -22,4 +28,5 @@ export global GlobalFiles := {
     property <string> current-path: "" ;
     property <bool> is_select_fold: false ;
     property <int> current-filiter:-1 ;
+    property <image> preview_image: DefaultAsserts.fileicon ;
 }

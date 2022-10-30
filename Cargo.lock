@@ -345,18 +345,9 @@ dependencies = [
 
 [[package]]
 name = "clru"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "218d6bd3dde8e442a975fa1cd233c0e5fded7596bccfe39f58eca98d22421e0a"
-
-[[package]]
-name = "cmake"
-version = "0.1.48"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8ad8cef104ac57b68b89df3208164d228503abbdce70f6880ffa3d970e7443a"
-dependencies = [
- "cc",
-]
+checksum = "ff2bf4436a5e3c7e32392df4147f524cfce8bc82e9fb573f99e8b11ce53b159a"
 
 [[package]]
 name = "cocoa"
@@ -430,6 +421,12 @@ checksum = "af4780a44ab5696ea9e28294517f1fffb421a83a25af521333c838635509db9c"
 dependencies = [
  "cache-padded",
 ]
+
+[[package]]
+name = "const-cstr"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed3d0b5ff30645a68f35ece8cea4556ca14ef8a1651455f789a099a0513532a6"
 
 [[package]]
 name = "const-field-offset"
@@ -878,16 +875,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 
 [[package]]
-name = "expat-sys"
-version = "2.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "658f19728920138342f68408b7cf7644d90d4784353d8ebc32e7e8663dbe45fa"
-dependencies = [
- "cmake",
- "pkg-config",
-]
-
-[[package]]
 name = "exr"
 version = "1.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1045,17 +1032,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a9c384f161156f5260c24a097c56119f9be8c798586aecc13afbcbe7b7e26bf8"
 dependencies = [
  "percent-encoding",
-]
-
-[[package]]
-name = "freetype-sys"
-version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a37d4011c0cc628dfa766fcc195454f4b068d7afdc2adfd28861191d866e731a"
-dependencies = [
- "cmake",
- "libc",
- "pkg-config",
 ]
 
 [[package]]
@@ -1393,9 +1369,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "i-slint-backend-qt"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1589084b68a2eb8fed077e85e47002c7b2c76f51a9499d5bccf6cadda18a7dc8"
+checksum = "d2f99f135cbceaf91d92a88829a348933b55032a86a2f30580638b24d85047f0"
 dependencies = [
  "const-field-offset",
  "cpp",
@@ -1413,9 +1389,9 @@ dependencies = [
 
 [[package]]
 name = "i-slint-backend-selector"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b44d3a137984e7121bd945e879ee60006001afcc1c51c75c504c2324c1c5a988"
+checksum = "33288a025d265650c5b2ee6f0bc9b0d01542e78b8d3d757acdafad02e73d9d75"
 dependencies = [
  "cfg-if 1.0.0",
  "i-slint-backend-qt",
@@ -1425,9 +1401,9 @@ dependencies = [
 
 [[package]]
 name = "i-slint-backend-winit"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb07476138b61260ac05299df79ca3ee16a3400cc54f0d896d09c5eb4fcb5f95"
+checksum = "90f453ec03efdccb112e5e167e3c6245c971b453d3da3295ff082e3ae65d7098"
 dependencies = [
  "cfg-if 1.0.0",
  "cfg_aliases",
@@ -1454,27 +1430,27 @@ dependencies = [
  "rgb",
  "scoped-tls-hkt",
  "send_wrapper",
- "servo-fontconfig",
- "ttf-parser 0.15.2",
+ "ttf-parser 0.17.1",
  "unicode-script",
  "vtable",
  "wasm-bindgen",
  "web-sys",
  "winapi",
  "winit",
+ "yeslogic-fontconfig-sys",
 ]
 
 [[package]]
 name = "i-slint-common"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8881bc11d12f2f02c3cbb57cc0f26549db649685a92731b4f15b853fe0a12a5f"
+checksum = "1ebdba8e1b9e1766003a60f00e4022832f9b891a72d4743048e5ed4dfcbb045e"
 
 [[package]]
 name = "i-slint-compiler"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "563819c042bfcd17a675f90466ea61260193e2a6ab171e24d16739dd50df56ab"
+checksum = "e738a71714725d0ba19f8c64ac2e4e990bae27eb5681e1c287f0632d05f79b7c"
 dependencies = [
  "by_address",
  "codemap",
@@ -1497,19 +1473,19 @@ dependencies = [
  "quote",
  "resvg",
  "rowan",
- "servo-fontconfig",
  "smol_str",
  "thiserror",
  "tiny-skia",
  "url",
  "usvg",
+ "yeslogic-fontconfig-sys",
 ]
 
 [[package]]
 name = "i-slint-core"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92b38d708ba250ef1bc62508c51e265ea55efb7cf5e3c81a537d3efa3b263ae8"
+checksum = "65ed906c953e90733b8ebd35bee844abe89ab8736b34e1ffb12053b0e0ab59ee"
 dependencies = [
  "atomic-polyfill",
  "auto_enums",
@@ -1550,9 +1526,9 @@ dependencies = [
 
 [[package]]
 name = "i-slint-core-macros"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bac04e540b04246ccf26dee7b7b0ec15bd36b8adea16f861bb7b9dfbc1455fc6"
+checksum = "a0c3aec4891968e30a9e6870835ccea4bda2172f8bb743454eb495819fd0b5c0"
 dependencies = [
  "quote",
  "syn",
@@ -2683,27 +2659,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "servo-fontconfig"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7e3e22fe5fd73d04ebf0daa049d3efe3eae55369ce38ab16d07ddd9ac5c217c"
-dependencies = [
- "libc",
- "servo-fontconfig-sys",
-]
-
-[[package]]
-name = "servo-fontconfig-sys"
-version = "5.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e36b879db9892dfa40f95da1c38a835d41634b825fbd8c4c418093d53c24b388"
-dependencies = [
- "expat-sys",
- "freetype-sys",
- "pkg-config",
-]
-
-[[package]]
 name = "sha1"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2783,9 +2738,9 @@ dependencies = [
 
 [[package]]
 name = "slint"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5957065dfb6a13dfbd33a5c9c7c96fdf460205697638c469f736671b5949276"
+checksum = "47aa48b16516f43468267b83980a121daf003bb659b89ff7c4f7e4e79c730dcd"
 dependencies = [
  "const-field-offset",
  "i-slint-backend-selector",
@@ -2799,9 +2754,9 @@ dependencies = [
 
 [[package]]
 name = "slint-build"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "788e5182f8a2f78415a93be9afcf92c2821ab1c5a275af94187c261b6181d673"
+checksum = "4990f8a2d9ad7a9041a1061ec94cb5b211c854aca815e506fa79e0fca383b26f"
 dependencies = [
  "i-slint-compiler",
  "spin_on",
@@ -2811,9 +2766,9 @@ dependencies = [
 
 [[package]]
 name = "slint-macros"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be7786ac0b1818111ab6ef7e7aa640c95ad96e26fe36a9228753e8c07ecdadf2"
+checksum = "566d42e47105e4ea4177eeb127388daad2e71ab5e7ca68de940c5cece2853a8d"
 dependencies = [
  "i-slint-compiler",
  "proc-macro2",
@@ -3133,14 +3088,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "toml_edit"
-version = "0.14.4"
+name = "toml_datetime"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5376256e44f2443f8896ac012507c19a012df0fe8758b55246ae51a2279db51f"
+checksum = "808b51e57d0ef8f71115d8f3a01e7d3750d01c79cac4b3eda910f4389fdf92fd"
+
+[[package]]
+name = "toml_edit"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1541ba70885967e662f69d31ab3aeca7b1aaecfcd58679590b893e9239c3646"
 dependencies = [
  "combine",
  "indexmap",
  "itertools",
+ "toml_datetime",
 ]
 
 [[package]]
@@ -3823,6 +3785,18 @@ name = "xmlwriter"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec7a2a501ed189703dba8b08142f057e887dfc4b2cc4db2d343ac6376ba3e0b9"
+
+[[package]]
+name = "yeslogic-fontconfig-sys"
+version = "3.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2bbd69036d397ebbff671b1b8e4d918610c181c5a16073b96f984a38d08c386"
+dependencies = [
+ "const-cstr",
+ "dlib",
+ "once_cell",
+ "pkg-config",
+]
 
 [[package]]
 name = "zbus"

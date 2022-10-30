@@ -1,3 +1,4 @@
+mod fileicon;
 mod io_file;
 slint::include_modules!();
 use io_file::ShowHow;
@@ -64,7 +65,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
         std::rc::Rc::new(VecModel::from(
             get_files_from_folder((*HOME).to_string(), ShowHow::OnlyVisible, defaultfiliter)
                 .into_iter()
-                .map(|file| match file {
+                .map(|file| match &file {
                     FileType::File {
                         name,
                         owner,
@@ -77,15 +78,17 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                         name: name.into(),
                         owner: owner.into(),
                         is_fold: false,
-                        mimetype: mimetype.into(),
+                        mimetype: mimetype.clone().into(),
                         permission: match (readable, runable) {
                             (false, false) => 0,
                             (true, false) => 1,
                             (false, true) => 2,
                             (true, true) => 3,
                         },
+                        image: fileicon::file_icon(),
                         file_path: filepath.into(),
                         beselected: false,
+                        sourcetype: file.source_type(),
                     },
                     FileType::Folder {
                         name,
@@ -98,15 +101,23 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                         owner: owner.into(),
                         is_fold: true,
                         mimetype: "".into(),
-                        permission: if viewable { 1 } else { 0 },
+                        permission: if *viewable { 1 } else { 0 },
+                        image: fileicon::fold_icon(),
                         file_path: filepath.into(),
                         beselected: false,
+                        sourcetype: file.source_type(),
                     },
                 })
                 .collect::<Vec<FileUnit>>(),
         ))
         .into(),
     );
+    let ui_handle = ui.as_weak();
+    ui.on_set_preview_image(move |glob, path| {
+        let ui = ui_handle.unwrap();
+        let globalfiles = GlobalFiles::get(&ui);
+        globalfiles.set_preview_image(fileicon::source_icon(glob.as_str(), path.as_str()));
+    });
     let ui_handle = ui.as_weak();
     ui.on_change_superpath(move || {
         let ui = ui_handle.unwrap();
@@ -128,10 +139,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
             .map(|unit| unit.file_path.to_string())
             .collect();
         let selectfiles = SelectedFiles::from_path(selected);
-        let _ = stdout_tx.send((
-            0,
-            selectfiles,
-        ));
+        let _ = stdout_tx.send((0, selectfiles));
         let _ = slint::quit_event_loop();
     });
     ui.on_cancel_selected(move || {
@@ -166,7 +174,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                 std::rc::Rc::new(VecModel::from(
                     get_files_from_folder(find_path.to_string(), showmod, Some(toselected))
                         .into_iter()
-                        .map(|file| match file {
+                        .map(|file| match &file {
                             FileType::File {
                                 name,
                                 owner,
@@ -179,15 +187,17 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                                 name: name.into(),
                                 owner: owner.into(),
                                 is_fold: false,
-                                mimetype: mimetype.into(),
+                                mimetype: mimetype.clone().into(),
                                 permission: match (readable, runable) {
                                     (false, false) => 0,
                                     (true, false) => 1,
                                     (false, true) => 2,
                                     (true, true) => 3,
                                 },
+                                image: fileicon::file_icon(),
                                 file_path: filepath.into(),
                                 beselected: false,
+                                sourcetype: file.source_type(),
                             },
                             FileType::Folder {
                                 name,
@@ -200,9 +210,11 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                                 owner: owner.into(),
                                 is_fold: true,
                                 mimetype: "".into(),
-                                permission: if viewable { 1 } else { 0 },
+                                image: fileicon::fold_icon(),
+                                permission: if *viewable { 1 } else { 0 },
                                 file_path: filepath.into(),
                                 beselected: false,
+                                sourcetype: file.source_type(),
                             },
                         })
                         .collect::<Vec<FileUnit>>(),
@@ -214,7 +226,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                 std::rc::Rc::new(VecModel::from(
                     get_files_from_folder(find_path.to_string(), showmod, Some(toselected))
                         .into_iter()
-                        .map(|file| match file {
+                        .map(|file| match &file {
                             FileType::File {
                                 name,
                                 owner,
@@ -227,15 +239,17 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                                 name: name.into(),
                                 owner: owner.into(),
                                 is_fold: false,
-                                mimetype: mimetype.into(),
+                                mimetype: mimetype.clone().into(),
                                 permission: match (readable, runable) {
                                     (false, false) => 0,
                                     (true, false) => 1,
                                     (false, true) => 2,
                                     (true, true) => 3,
                                 },
+                                image: fileicon::file_icon(),
                                 file_path: filepath.into(),
                                 beselected: false,
+                                sourcetype: file.source_type(),
                             },
                             FileType::Folder {
                                 name,
@@ -248,9 +262,11 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
                                 owner: owner.into(),
                                 is_fold: true,
                                 mimetype: "".into(),
-                                permission: if viewable { 1 } else { 0 },
+                                permission: if *viewable { 1 } else { 0 },
+                                image: fileicon::fold_icon(),
                                 file_path: filepath.into(),
                                 beselected: false,
+                                sourcetype: file.source_type(),
                             },
                         })
                         .collect::<Vec<FileUnit>>(),

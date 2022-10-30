@@ -3,6 +3,9 @@ use once_cell::sync::Lazy;
 use shanatypes::{FileFilter, FilterType};
 use std::os::unix::fs::MetadataExt;
 use std::path::Path;
+
+const ICONPATTERN: [&str; 3] = ["image/png", "image/jpeg", "image/svg+xml"];
+
 pub static HOME: Lazy<String> = Lazy::new(|| std::env::var("HOME").unwrap());
 pub static HIDDEN_FILE: Lazy<Pattern> = Lazy::new(|| Pattern::new(".*").unwrap());
 mod permission_mods {
@@ -69,6 +72,17 @@ impl FileType {
         match self {
             Self::File { .. } => false,
             Self::Folder { .. } => true,
+        }
+    }
+
+    pub fn source_type(&self) -> i32 {
+        match self {
+            FileType::Folder { .. } => 0,
+            FileType::File { mimetype, .. } => if ICONPATTERN.contains(&mimetype.as_str()) {
+                1
+            } else {
+                0
+            },
         }
     }
 }
