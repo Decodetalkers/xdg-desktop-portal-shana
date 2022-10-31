@@ -4,7 +4,7 @@ use shanatypes::{FileFilter, FilterType};
 use std::os::unix::fs::MetadataExt;
 use std::path::Path;
 
-const ICONPATTERN: [&str; 3] = ["image/png", "image/jpeg", "image/svg+xml"];
+use crate::patterns::{ICONPATTERN, TEXTPATTERN};
 
 pub static HOME: Lazy<String> = Lazy::new(|| std::env::var("HOME").unwrap());
 pub static HIDDEN_FILE: Lazy<Pattern> = Lazy::new(|| Pattern::new(".*").unwrap());
@@ -78,11 +78,15 @@ impl FileType {
     pub fn source_type(&self) -> i32 {
         match self {
             FileType::Folder { .. } => 0,
-            FileType::File { mimetype, .. } => if ICONPATTERN.contains(&mimetype.as_str()) {
-                1
-            } else {
-                0
-            },
+            FileType::File { mimetype, .. } => {
+                if ICONPATTERN.contains(&mimetype.as_str()) {
+                    1
+                } else if TEXTPATTERN.contains(&mimetype.as_str()) {
+                    2
+                } else {
+                    0
+                }
+            }
         }
     }
 }

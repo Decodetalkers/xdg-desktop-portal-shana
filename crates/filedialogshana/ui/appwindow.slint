@@ -1,4 +1,4 @@
-import {StandardListView, Button, VerticalBox , HorizontalBox, ScrollView, GroupBox, ComboBox, ListView, CheckBox} from "std-widgets.slint";
+import {StandardListView, Button, VerticalBox , HorizontalBox, ScrollView, GroupBox, ComboBox, ListView, CheckBox, TextEdit} from "std-widgets.slint";
 
 import {FileUnit, GlobalFiles, DefaultAsserts} from "global.slint";
 
@@ -16,6 +16,7 @@ export AppWindow := Window {
     callback change_filiter(int, string, int);
     callback change_superpath();
     callback set_preview_image(string,string);
+    callback set_preview_text(string);
     title <=> m_title;
     forward-focus: top-key-handle;
     top-key-handle := FocusScope {
@@ -244,6 +245,11 @@ export AppWindow := Window {
                                     GlobalFiles.left[left.selected].file_path
                                 );
                             }
+                            if (GlobalFiles.left[left.selected].sourcetype == 2) {
+                                set_preview_text(
+                                    GlobalFiles.left[left.selected].file_path
+                                );
+                            }
                             accept
                         }
                     }
@@ -331,6 +337,12 @@ export AppWindow := Window {
         if (GlobalFiles.left[left.selected].sourcetype == 1) : VerticalBox {
             Image { 
                 source: GlobalFiles.preview-image;
+            }
+        }
+        if (GlobalFiles.left[left.selected].sourcetype == 2) : VerticalBox {
+            TextEdit { 
+                text: GlobalFiles.preview-text;
+                wrap: word-wrap;
             }
         }
     }

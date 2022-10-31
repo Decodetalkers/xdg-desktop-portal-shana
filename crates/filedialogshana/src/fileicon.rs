@@ -1,9 +1,13 @@
 slint::include_modules!();
-use std::path::Path;
+use std::{fs, path::Path};
 
 use slint::Image;
 
-const ICONPATTERN: [&str; 3] = ["image/png", "image/jpeg", "image/svg+xml"];
+use crate::patterns::ICONPATTERN;
+
+pub fn source_text(path: impl AsRef<Path>) -> String {
+    fs::read_to_string(path).unwrap_or("Error".to_string())
+}
 
 pub fn source_icon(pattern: &str, path: impl AsRef<Path>) -> Image {
     let icondefault = DefaultAsserts::get(&AppWindow::new()).get_fileicon();

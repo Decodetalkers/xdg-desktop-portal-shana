@@ -1,5 +1,6 @@
 mod fileicon;
 mod io_file;
+mod patterns;
 slint::include_modules!();
 use io_file::ShowHow;
 use io_file::*;
@@ -117,6 +118,12 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
         let ui = ui_handle.unwrap();
         let globalfiles = GlobalFiles::get(&ui);
         globalfiles.set_preview_image(fileicon::source_icon(glob.as_str(), path.as_str()));
+    });
+    let ui_handle = ui.as_weak();
+    ui.on_set_preview_text(move |path| {
+        let ui = ui_handle.unwrap();
+        let globalfiles = GlobalFiles::get(&ui);
+        globalfiles.set_preview_text(fileicon::source_text(path.as_str()).into());
     });
     let ui_handle = ui.as_weak();
     ui.on_change_superpath(move || {
