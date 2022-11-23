@@ -55,7 +55,7 @@ pub struct OpenFileOptions {
     directory: Option<bool>,
     filters: Vec<FileFilter>, // Filter
     current_filter: Option<FileFilter>,
-    choices: Vec<Choice>,
+    choices: Option<Vec<Choice>>,
 }
 
 impl OpenFileOptions {
@@ -98,7 +98,7 @@ pub struct SaveFileOptions {
     multiple: Option<bool>,       // bool
     filters: Vec<FileFilter>,
     current_filter: Option<FileFilter>,
-    choices: Vec<Choice>,
+    choices: Option<Vec<Choice>>,
     current_name: Option<String>,
     current_folder: Option<Vec<u8>>,
     current_file: Option<Vec<u8>>,
