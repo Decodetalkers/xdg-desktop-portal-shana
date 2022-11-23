@@ -1,0 +1,21 @@
+pkgname=xdg-desktop-portal-shana
+pkgver=0.2.1
+pkgrel=1.0
+pkgdesc='xdg-desktop-portal-shana'
+arch=('x86_64' 'aarch64')
+depends=('qt5-base')
+makedepends=('git' 'ninja' 'meson' 'rust')
+source=('source.tar.gz')
+sha256sums=('SKIP')
+
+build() {
+  meson setup \
+    -Dprefix=/usr \
+    -Dlibexecdir=lib \
+    -Dbuildtype=release \
+    -build
+  ninja -C build
+}
+package() {
+  DESTDIR="$pkgdir" ninja -C build install
+}
