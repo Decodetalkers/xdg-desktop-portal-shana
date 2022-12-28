@@ -48,8 +48,9 @@ impl Shana {
 }
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    std::env::set_var("RUST_LOG", "xdg-desktop-protal-shana=info");
     tracing_subscriber::fmt()
-        .with_max_level(Level::TRACE)
+        .with_max_level(Level::INFO)
         .finish();
     info!("Shana Start");
     ConnectionBuilder::session()?

@@ -31,7 +31,7 @@ export AppWindow := Window {
             GroupBox { 
                 title: "Filiter";
                 ScrollView { 
-                    VerticalBox {  
+                    VerticalBox {
                         for unit in GlobalFiles.filiter: CheckBox {
                             text: unit.filiter;
                             checked: unit.selected;
@@ -180,7 +180,7 @@ export AppWindow := Window {
                                     GlobalFiles.last-selected = left.selected;
                                 }
                             }
-                            if (event.text == Keys.DownArrow) {
+                            if (event.text == Key.DownArrow) {
                                 if (left.selected >= GlobalFiles.left.length - 1) {
                                     left.selected = 0;
                                     left.viewport-y = 0;
@@ -189,7 +189,7 @@ export AppWindow := Window {
                                     left.viewport-y = -1 *left.selected * 98px;
                                 }
                             }
-                            if (event.text == Keys.UpArrow) {
+                            if (event.text == Key.UpArrow) {
                                 if (left.selected <= 0 ) {
                                     left.selected = GlobalFiles.left.length - 1;
                                     left.viewport-y = -1 * (GlobalFiles.left.length - 1) * 98px;
@@ -198,7 +198,7 @@ export AppWindow := Window {
                                     left.viewport-y = -1 * left.selected * 98px;
                                 }
                             }
-                            if (event.text == Keys.Return && GlobalFiles.left[left.selected].permission == 1) {
+                            if (event.text == Key.Return && GlobalFiles.left[left.selected].permission == 1) {
                                 if(GlobalFiles.left[left.selected].is_fold) {
                                     GlobalFiles.current-path = GlobalFiles.left[left.selected].file_path;
                                     change_filiter(
@@ -224,7 +224,7 @@ export AppWindow := Window {
                             }
 
 
-                            if (event.text == Keys.LeftArrow) {
+                            if (event.text == Key.LeftArrow) {
                                 change-superpath();
                                 change_filiter(
                                     //filitermode.current-index,
@@ -235,7 +235,7 @@ export AppWindow := Window {
                                 left.selected = -1;
                             }
 
-                            if (event.text == Keys.RightArrow && show-preview) {
+                            if (event.text == Key.RightArrow && show-preview) {
                                 right.focus();
                             }
                             
@@ -290,7 +290,7 @@ export AppWindow := Window {
                     forward-focus: key-filechooser_right;
                     key-filechooser_right := FocusScope {
                         key-pressed(event) => {
-                            if (event.text == Keys.DownArrow) {
+                            if (event.text == Key.DownArrow) {
                                 if (right.selected >= GlobalFiles.right.length - 1) {
                                     right.selected = 0;
                                     right.viewport-y = 0;
@@ -299,7 +299,7 @@ export AppWindow := Window {
                                     right.viewport-y = -1 *right.selected * 98px;
                                 }
                             }
-                            if (event.text == Keys.UpArrow) {
+                            if (event.text == Key.UpArrow) {
                                 if (right.selected <= 0) {
                                     right.selected = GlobalFiles.right.length - 1;
                                     right.viewport-y = -1 * (GlobalFiles.right.length - 1) * 98px;
@@ -309,7 +309,7 @@ export AppWindow := Window {
                                 }
                             }
 
-                            if (event.text == Keys.LeftArrow) {
+                            if (event.text == Key.LeftArrow) {
                                 right.selected = -1;
                                 left.focus();
                             }
