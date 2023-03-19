@@ -53,7 +53,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with_max_level(Level::INFO)
         .finish();
     info!("Shana Start");
-    ConnectionBuilder::session()?
+    let _conn = ConnectionBuilder::session()?
         .name("org.freedesktop.impl.portal.desktop.shana")?
         .serve_at("/org/freedesktop/portal/desktop", Shana)?
         .build()
