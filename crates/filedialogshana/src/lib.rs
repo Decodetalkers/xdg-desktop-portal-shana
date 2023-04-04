@@ -36,14 +36,11 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
             index_final
         }
     };
-    let defaultfiliter = match default_filter {
-        Some(filiter) => Some(vec![filiter]),
-        None => None,
-    };
+    let defaultfiliter = default_filter.map(|filiter| vec![filiter]);
     let filters_forset = filters.clone();
     let (stdout_tx, stdout_rs) = mpsc::channel();
     let stdout_tx_cancel = stdout_tx.clone();
-    let ui = AppWindow::new();
+    let ui = AppWindow::new().unwrap();
     ui.set_m_title(title.into());
     let globalfiles = GlobalFiles::get(&ui);
     globalfiles.set_filiter(
@@ -64,7 +61,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
     globalfiles.set_current_filiter(current_index);
     globalfiles.set_left(
         std::rc::Rc::new(VecModel::from(
-            get_files_from_folder((*HOME).to_string(), ShowHow::OnlyVisible, defaultfiliter)
+            get_files_from_folder(&(*HOME), ShowHow::OnlyVisible, defaultfiliter)
                 .into_iter()
                 .map(|file| match &file {
                     FileType::File {
@@ -163,7 +160,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
     ui.on_change_filiter(move |howtoshow, find_path, side| {
         let ui = ui_handle.unwrap();
         let globalfiles = GlobalFiles::get(&ui);
-        let filiters = globalfiles.get_filiter().to_owned();
+        let filiters = globalfiles.get_filiter();
         let showmod = match howtoshow {
             0 => ShowHow::OnlyVisible,
             1 => ShowHow::ShowHidden,
@@ -282,7 +279,7 @@ pub fn choose_file(messages: SelectFunction) -> (u32, SelectedFiles) {
             );
         }
     });
-    ui.run();
+    let _ = ui.run();
     if let Ok(output) = stdout_rs.recv_timeout(std::time::Duration::from_nanos(300)) {
         output
     } else {

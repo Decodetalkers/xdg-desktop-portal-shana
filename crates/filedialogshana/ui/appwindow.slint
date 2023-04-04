@@ -7,8 +7,8 @@ export {
     DefaultAsserts
 }
 
-export AppWindow := Window {
-    property <string> m_title;
+export component AppWindow inherits Window {
+    in property <string> m_title;
     property <bool> show_preview : false ;
     callback select_file();
     callback cancel_selected();
@@ -35,8 +35,8 @@ export AppWindow := Window {
                         for unit in GlobalFiles.filiter: CheckBox {
                             text: unit.filiter;
                             checked: unit.selected;
-                            toggled => { 
-                                unit.selected = checked;
+                            toggled => {
+                                unit.selected = self.checked;
                                 change_filiter(
                                     //filitermode.current-index,
                                     showmode.current-index,
@@ -62,7 +62,7 @@ export AppWindow := Window {
                     selected => { 
                         change_filiter(
                             //filitermode.current-index,
-                            current-index,
+                            self.current-index,
                             GlobalFiles.current-path,
                             0
                         );

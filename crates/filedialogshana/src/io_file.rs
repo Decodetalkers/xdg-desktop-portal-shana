@@ -58,7 +58,7 @@ impl FileType {
             Self::Folder { .. } => true,
             Self::File { name, .. } => {
                 let pattern = Pattern::new(input).unwrap();
-                pattern.matches(&name)
+                pattern.matches(name)
             }
         }
     }

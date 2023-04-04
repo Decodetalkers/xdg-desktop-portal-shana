@@ -10,7 +10,7 @@ pub fn source_text(path: impl AsRef<Path>) -> String {
 }
 
 pub fn source_icon(pattern: &str, path: impl AsRef<Path>) -> Image {
-    let icondefault = DefaultAsserts::get(&AppWindow::new()).get_fileicon();
+    let icondefault = DefaultAsserts::get(&AppWindow::new().unwrap()).get_fileicon();
     if ICONPATTERN.contains(&pattern) {
         match Image::load_from_path(path.as_ref()) {
             Ok(image) => image,
@@ -22,9 +22,9 @@ pub fn source_icon(pattern: &str, path: impl AsRef<Path>) -> Image {
 }
 #[inline]
 pub fn fold_icon() -> Image {
-    DefaultAsserts::get(&AppWindow::new()).get_fileicon()
+    DefaultAsserts::get(&AppWindow::new().unwrap()).get_fileicon()
 }
 #[inline]
 pub fn file_icon() -> Image {
-    DefaultAsserts::get(&AppWindow::new()).get_fileicon()
+    DefaultAsserts::get(&AppWindow::new().unwrap()).get_fileicon()
 }

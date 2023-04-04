@@ -1,4 +1,4 @@
-export struct FileUnit := {
+export struct FileUnit {
     name: string,
     owner: string,
     is_fold: bool,
@@ -10,24 +10,24 @@ export struct FileUnit := {
     sourcetype: int,
 }
 
-export struct FilterFun := {
+export struct FilterFun {
     filiter : string,
     selected: bool,
 }
 
-export global DefaultAsserts := {
-    property <image> fileicon : @image-url("../assert/revolution.png");
+export global DefaultAsserts {
+    in-out property <image> fileicon : @image-url("../assert/revolution.png");
 }
 
-export global GlobalFiles := {
-    property <[FileUnit]> left: [];
-    property <[FileUnit]> right: [];
-    property <[FilterFun]> filiter :[];
-    property <bool> signalfile: false;
-    property <int> last-selected: -1 ;
-    property <string> current-path: "" ;
-    property <bool> is_select_fold: false ;
-    property <int> current-filiter:-1 ;
-    property <image> preview_image: DefaultAsserts.fileicon ;
-    property <string> preview_text: "" ;
+export global GlobalFiles {
+    in-out property <[FileUnit]> left: [];
+    in-out property <[FileUnit]> right: [];
+    in-out property <[FilterFun]> filiter :[];
+    in-out property <bool> signalfile: false;
+    in-out property <int> last-selected: -1 ;
+    in-out property <string> current-path: "" ;
+    in-out property <bool> is_select_fold: false ;
+    in-out property <int> current-filiter:-1 ;
+    in-out property <image> preview_image: DefaultAsserts.fileicon ;
+    in-out property <string> preview_text: "" ;
 }
