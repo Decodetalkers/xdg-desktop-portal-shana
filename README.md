@@ -4,7 +4,7 @@
 
 
 ## How it works
-it just redirect other portal to it, `the protal of protal`, maybe?
+it just redirect other portal to it, `the portal of portal`, maybe?
 
 now it just use
 
