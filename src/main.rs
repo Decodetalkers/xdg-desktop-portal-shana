@@ -1,10 +1,14 @@
 mod config;
 mod protaltypes;
-use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
-use std::{error::Error, future::pending, collections::HashMap};
-use tracing::{info, Level};
-use zbus::{dbus_interface, dbus_proxy, zvariant::{ObjectPath, Value, OwnedValue}, ConnectionBuilder};
 use config::Config;
+use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
+use std::{collections::HashMap, error::Error, future::pending};
+use tracing::{info, Level};
+use zbus::{
+    dbus_interface, dbus_proxy,
+    zvariant::{ObjectPath, OwnedValue, Value},
+    ConnectionBuilder,
+};
 struct Shana {
     backendconfig: ProtalConfig,
 }
@@ -154,7 +158,7 @@ impl Shana {
         parent_window: String,
         title: String,
         options: HashMap<String, Value<'_>>,
-    ) -> (u32, HashMap<String,OwnedValue>) {
+    ) -> (u32, HashMap<String, OwnedValue>) {
         let Ok(connection) = zbus::Connection::session().await else {
             return (0, HashMap::new());
         };
@@ -189,12 +193,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let backendconfig = ProtalConfig::from(config);
     let _conn = ConnectionBuilder::session()?
         .name("org.freedesktop.impl.portal.desktop.shana")?
-        .serve_at(
-            "/org/freedesktop/portal/desktop",
-            Shana {
-                backendconfig,
-            },
-        )?
+        .serve_at("/org/freedesktop/portal/desktop", Shana { backendconfig })?
         .build()
         .await?;
     pending::<()>().await;

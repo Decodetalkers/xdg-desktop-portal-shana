@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::Serialize_repr;
 use zbus::zvariant::{DeserializeDict, SerializeDict, Type};
 // SelectedFiles
-#[derive(SerializeDict,DeserializeDict, Type, Debug, Default)]
+#[derive(SerializeDict, DeserializeDict, Type, Debug, Default)]
 #[zvariant(signature = "dict")]
 pub struct SelectedFiles {
     pub uris: Vec<url::Url>,
