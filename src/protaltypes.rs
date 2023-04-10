@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::Serialize_repr;
 use zbus::zvariant::{DeserializeDict, SerializeDict, Type};
 // SelectedFiles
-#[derive(SerializeDict, Type, Debug, Default)]
+#[derive(SerializeDict,DeserializeDict, Type, Debug, Default)]
 #[zvariant(signature = "dict")]
 pub struct SelectedFiles {
     pub uris: Vec<url::Url>,
@@ -15,7 +15,7 @@ impl SelectedFiles {
         Self {
             uris: path
                 .iter()
-                .map(|pathunit| url::Url::from_file_path(pathunit))
+                .map(url::Url::from_file_path)
                 .filter_map(|urlunit| urlunit.ok())
                 .collect(),
             choices: None,
@@ -50,8 +50,8 @@ impl FileFilter {
 #[zvariant(signature = "dict")]
 pub struct OpenFileOptions {
     accept_label: Option<String>, // WindowTitle
-    modal: Option<bool>,              // bool
-    multiple: Option<bool>,           // bool
+    modal: Option<bool>,          // bool
+    multiple: Option<bool>,       // bool
     directory: Option<bool>,
     filters: Vec<FileFilter>, // Filter
     current_filter: Option<FileFilter>,
