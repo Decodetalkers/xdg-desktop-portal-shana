@@ -1,8 +1,6 @@
 # xdg-desktop-portal-shana
 
-## Show
-![select file](./show/choosefile.png)
-![save file](./show/savefile.png)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/xdg-desktop-portal-shana.svg)](https://repology.org/project/xdg-desktop-portal-shana/versions)
 
 
 ## How it works
@@ -12,3 +10,9 @@ now it just use
 
 * Gnome
 * kde
+
+## Show
+
+![select file](./show/choosefile.png)
+
+![save file](./show/savefile.png)
