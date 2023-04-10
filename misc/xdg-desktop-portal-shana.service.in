@@ -1,4 +1,11 @@
-[D-BUS Service]
-Name=org.freedesktop.impl.portal.desktop.shana
-Exec=@xdg_install_dir@/xdg-desktop-portal-shana
-SystemdService=xdg-desktop-portal-shana.service
+[Unit]
+Description=Portal service (wlroots implementation)
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.impl.portal.desktop.shana
+ExecStart=@xdg_install_dir@/xdg-desktop-portal-shana
+Restart=on-failure

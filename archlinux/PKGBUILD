@@ -9,11 +9,10 @@ source=('source.tar.gz')
 sha256sums=('SKIP')
 
 build() {
-  meson setup \
+  meson setup build \
     -Dprefix=/usr \
     -Dlibexecdir=lib \
-    -Dbuildtype=release \
-    -build
+    -Dbuildtype=release
   ninja -C build
 }
 package() {
