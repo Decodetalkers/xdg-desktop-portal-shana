@@ -50,7 +50,7 @@ dbus_service_file = configure_file(
 )
 
 xdg_target = custom_target('xdg-deskop-portal-shana',
-  output: 'xdg-deskop-portal-shana',
+  output: 'xdg-desktop-portal-shana',
   build_by_default: true,
   install: true,
   install_dir: xdg_install_dir,
