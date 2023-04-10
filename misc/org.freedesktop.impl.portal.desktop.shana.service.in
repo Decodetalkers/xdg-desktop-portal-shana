@@ -1,4 +1,4 @@
 [D-BUS Service]
 Name=org.freedesktop.impl.portal.desktop.shana
-Exec=/usr/local/lib/xdg-desktop-portal-shana
+Exec=@xdg_install_dir@/xdg-desktop-portal-shana
 SystemdService=xdg-desktop-portal-shana.service
