@@ -1,9 +1,9 @@
 mod config;
 mod protaltypes;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
-use std::{error::Error, future::pending};
+use std::{error::Error, future::pending, collections::HashMap};
 use tracing::{info, Level};
-use zbus::{dbus_interface, dbus_proxy, zvariant::ObjectPath, ConnectionBuilder};
+use zbus::{dbus_interface, dbus_proxy, zvariant::{ObjectPath, Value, OwnedValue}, ConnectionBuilder};
 use config::Config;
 struct Shana {
     backendconfig: ProtalConfig,
@@ -49,8 +49,8 @@ trait XdgDesktopKde {
         app_id: String,
         parent_window: String,
         title: String,
-        options: SaveFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
+        options: HashMap<String, Value<'_>>,
+    ) -> zbus::Result<(u32, HashMap<String, OwnedValue>)>;
 }
 
 #[dbus_proxy(
@@ -81,8 +81,8 @@ trait XdgDesktopGnome {
         app_id: String,
         parent_window: String,
         title: String,
-        options: SaveFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
+        options: HashMap<String, Value<'_>>,
+    ) -> zbus::Result<(u32, HashMap<String, OwnedValue>)>;
 }
 
 //mod filechoosertypes;
@@ -153,25 +153,25 @@ impl Shana {
         app_id: String,
         parent_window: String,
         title: String,
-        options: SaveFileOptions,
-    ) -> (u32, SelectedFiles) {
+        options: HashMap<String, Value<'_>>,
+    ) -> (u32, HashMap<String,OwnedValue>) {
         let Ok(connection) = zbus::Connection::session().await else {
-            return (0, SelectedFiles::default());
+            return (0, HashMap::new());
         };
         if self.backendconfig.savefile == PortalSelect::Gnome {
             let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
+                return (0, HashMap::new());
             };
             let Ok(output) = proxy.save_files(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
+                return (0, HashMap::new());
             };
             output
         } else {
             let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
+                return (0, HashMap::new());
             };
             let Ok(output) = proxy.save_files(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
+                return (0, HashMap::new());
             };
             output
         }
