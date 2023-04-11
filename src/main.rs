@@ -1,92 +1,24 @@
+mod backends;
 mod config;
 mod protaltypes;
+use backends::*;
 use config::Config;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{collections::HashMap, error::Error, future::pending};
 use tracing::{info, Level};
 use zbus::{
-    dbus_interface, dbus_proxy,
+    dbus_interface,
     zvariant::{ObjectPath, OwnedValue, Value},
     ConnectionBuilder,
 };
+
 struct Shana {
     backendconfig: ProtalConfig,
-}
-
-#[allow(unused)]
-#[derive(PartialEq, PartialOrd)]
-enum PortalSelect {
-    Kde,
-    Gnome,
 }
 
 struct ProtalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,
-}
-
-#[dbus_proxy(
-    interface = "org.freedesktop.impl.portal.FileChooser",
-    default_service = "org.freedesktop.impl.portal.desktop.kde",
-    default_path = "/org/freedesktop/portal/desktop"
-)]
-trait XdgDesktopKde {
-    fn open_file(
-        &self,
-        handle: ObjectPath<'_>,
-        app_id: String,
-        parent_window: String,
-        title: String,
-        options: OpenFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
-    fn save_file(
-        &self,
-        handle: ObjectPath<'_>,
-        app_id: String,
-        parent_window: String,
-        title: String,
-        options: SaveFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
-    fn save_files(
-        &self,
-        handle: ObjectPath<'_>,
-        app_id: String,
-        parent_window: String,
-        title: String,
-        options: HashMap<String, Value<'_>>,
-    ) -> zbus::Result<(u32, HashMap<String, OwnedValue>)>;
-}
-
-#[dbus_proxy(
-    interface = "org.freedesktop.impl.portal.FileChooser",
-    default_service = "org.freedesktop.impl.portal.desktop.gnome",
-    default_path = "/org/freedesktop/portal/desktop"
-)]
-trait XdgDesktopGnome {
-    fn open_file(
-        &self,
-        handle: ObjectPath<'_>,
-        app_id: String,
-        parent_window: String,
-        title: String,
-        options: OpenFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
-    fn save_file(
-        &self,
-        handle: ObjectPath<'_>,
-        app_id: String,
-        parent_window: String,
-        title: String,
-        options: SaveFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
-    fn save_files(
-        &self,
-        handle: ObjectPath<'_>,
-        app_id: String,
-        parent_window: String,
-        title: String,
-        options: HashMap<String, Value<'_>>,
-    ) -> zbus::Result<(u32, HashMap<String, OwnedValue>)>;
 }
 
 //mod filechoosertypes;
@@ -111,8 +43,24 @@ impl Shana {
                 return (0, SelectedFiles::default());
             };
             output
-        } else {
+        } else if self.backendconfig.openfile == PortalSelect::Lxqt {
+            let Ok(proxy) = XdgDesktopLxqtProxy::new(&connection).await else {
+                return (0, SelectedFiles::default());
+            };
+            let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
+                return (0, SelectedFiles::default());
+            };
+            output
+        } else if self.backendconfig.openfile == PortalSelect::Kde {
             let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
+                return (0, SelectedFiles::default());
+            };
+            let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
+                return (0, SelectedFiles::default());
+            };
+            output
+        } else {
+            let Ok(proxy) = XdgDesktopGtkProxy::new(&connection).await else {
                 return (0, SelectedFiles::default());
             };
             let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
@@ -141,8 +89,24 @@ impl Shana {
                 return (0, SelectedFiles::default());
             };
             output
-        } else {
+        } else if self.backendconfig.savefile == PortalSelect::Lxqt {
+            let Ok(proxy) = XdgDesktopLxqtProxy::new(&connection).await else {
+                return (0, SelectedFiles::default());
+            };
+            let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
+                return (0, SelectedFiles::default());
+            };
+            output
+        } else if self.backendconfig.savefile == PortalSelect::Kde {
             let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
+                return (0, SelectedFiles::default());
+            };
+            let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
+                return (0, SelectedFiles::default());
+            };
+            output
+        } else {
+            let Ok(proxy) = XdgDesktopGtkProxy::new(&connection).await else {
                 return (0, SelectedFiles::default());
             };
             let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
@@ -162,6 +126,7 @@ impl Shana {
         let Ok(connection) = zbus::Connection::session().await else {
             return (0, HashMap::new());
         };
+        // INFO: only gtk and gnome have savefiles, so if not use gnome or gtk, all fallback to gtk
         if self.backendconfig.savefile == PortalSelect::Gnome {
             let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
                 return (0, HashMap::new());
@@ -171,7 +136,7 @@ impl Shana {
             };
             output
         } else {
-            let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
+            let Ok(proxy) = XdgDesktopGtkProxy::new(&connection).await else {
                 return (0, HashMap::new());
             };
             let Ok(output) = proxy.save_files(handle, app_id, parent_window, title, options).await else {

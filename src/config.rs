@@ -31,10 +31,11 @@ impl Config {
 
 impl From<String> for super::PortalSelect {
     fn from(value: String) -> Self {
-        if value == "Gnome" {
-            Self::Gnome
-        } else {
-            Self::Kde
+        match value.as_str() {
+            "Gnome" => Self::Gnome,
+            "Kde" => Self::Kde,
+            "Lxqt" => Self::Lxqt,
+            _ => Self::Gtk,
         }
     }
 }

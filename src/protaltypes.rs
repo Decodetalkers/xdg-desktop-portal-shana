@@ -10,6 +10,8 @@ pub struct SelectedFiles {
     pub uris: Vec<url::Url>,
     pub choices: Option<Vec<(String, String)>>,
 }
+
+#[allow(dead_code)]
 impl SelectedFiles {
     pub fn from_path(path: Vec<impl AsRef<Path>>) -> Self {
         Self {
@@ -36,6 +38,7 @@ pub enum FilterType {
 #[derive(Clone, Serialize, Deserialize, Type, Debug)]
 pub struct FileFilter(String, Vec<(FilterType, String)>);
 
+#[allow(dead_code)]
 impl FileFilter {
     pub fn get_filters(&self) -> Vec<(FilterType, String)> {
         self.1.clone()
@@ -58,6 +61,7 @@ pub struct OpenFileOptions {
     choices: Option<Vec<Choice>>,
 }
 
+#[allow(dead_code)]
 impl OpenFileOptions {
     pub fn select_function(&self) -> SelectFunction {
         if let Some(true) = self.directory {
@@ -76,6 +80,7 @@ impl OpenFileOptions {
     }
 }
 
+#[allow(dead_code)]
 pub enum SelectFunction {
     File {
         title: String,
