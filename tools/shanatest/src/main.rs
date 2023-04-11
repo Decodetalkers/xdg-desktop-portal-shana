@@ -17,8 +17,9 @@ async fn main() -> ashpd::Result<()> {
         .filter(FileFilter::new("SVG Image").mimetype("image/svg+xml"))
         .filter(FileFilter::new("JPEG Image").glob("*.jpg"))
         .current_filter(FileFilter::new("JPEG Image").glob("*.jpg"))
-        .build()
-        .await?;
+        .send()
+        .await?
+        .response()?;
 
     println!("{:#?}", files);
 
@@ -30,8 +31,9 @@ async fn main() -> ashpd::Result<()> {
         //.filter(FileFilter::new("SVG Image").mimetype("image/svg+xml"))
         .filter(FileFilter::new("JPEG Image").glob("*.jpg"))
         .current_filter(FileFilter::new("JPEG Image").glob("*.jpg"))
-        .build()
-        .await?;
+        .send()
+        .await?
+        .response()?;
 
     println!("{:#?}", files);
 
