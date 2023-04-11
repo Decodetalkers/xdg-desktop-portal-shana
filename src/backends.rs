@@ -12,12 +12,12 @@ pub enum PortalSelect {
     Gtk,
 }
 use crate::protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
+
 #[dbus_proxy(
     interface = "org.freedesktop.impl.portal.FileChooser",
     default_service = "org.freedesktop.impl.portal.desktop.kde",
     default_path = "/org/freedesktop/portal/desktop"
 )]
-
 trait XdgDesktopKde {
     fn open_file(
         &self,
