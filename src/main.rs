@@ -3,14 +3,26 @@ mod config;
 mod protaltypes;
 use backends::*;
 use config::Config;
+use once_cell::sync::OnceCell;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{collections::HashMap, error::Error, future::pending};
-use tracing::{info, Level};
 use zbus::{
-    dbus_interface,
+    dbus_interface, fdo,
     zvariant::{ObjectPath, OwnedValue, Value},
     ConnectionBuilder,
 };
+
+static SESSION: OnceCell<zbus::Connection> = OnceCell::new();
+
+async fn get_connection() -> zbus::Result<zbus::Connection> {
+    if let Some(cnx) = SESSION.get() {
+        Ok(cnx.clone())
+    } else {
+        let cnx = zbus::Connection::session().await?;
+        SESSION.set(cnx.clone()).expect("Can't reset a OnceCell");
+        Ok(cnx)
+    }
+}
 
 struct Shana {
     backendconfig: ProtalConfig,
@@ -31,42 +43,32 @@ impl Shana {
         parent_window: String,
         title: String,
         options: OpenFileOptions,
-    ) -> (u32, SelectedFiles) {
-        let Ok(connection) = zbus::Connection::session().await else {
-            return (0, SelectedFiles::default());
-        };
+    ) -> fdo::Result<(u32, SelectedFiles)> {
+        let connection = get_connection().await?;
         if self.backendconfig.openfile == PortalSelect::Gnome {
-            let Ok(proxy) = XdgDesktopGnomeProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
+            let output = proxy
+                .open_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         } else if self.backendconfig.openfile == PortalSelect::Lxqt {
-            let Ok(proxy) = XdgDesktopLxqtProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
+            let output = proxy
+                .open_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         } else if self.backendconfig.openfile == PortalSelect::Kde {
-            let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopKdeProxy::new(&connection).await?;
+            let output = proxy
+                .open_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         } else {
-            let Ok(proxy) = XdgDesktopGtkProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.open_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopGtkProxy::new(&connection).await?;
+            let output = proxy
+                .open_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         }
     }
 
@@ -77,44 +79,35 @@ impl Shana {
         parent_window: String,
         title: String,
         options: SaveFileOptions,
-    ) -> (u32, SelectedFiles) {
-        let Ok(connection) = zbus::Connection::session().await else {
-            return (0, SelectedFiles::default());
-        };
+    ) -> fdo::Result<(u32, SelectedFiles)> {
+        let connection = get_connection().await?;
         if self.backendconfig.savefile == PortalSelect::Gnome {
-            let Ok(proxy) = XdgDesktopGnomeProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
+            let output = proxy
+                .save_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         } else if self.backendconfig.savefile == PortalSelect::Lxqt {
-            let Ok(proxy) = XdgDesktopLxqtProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
+            let output = proxy
+                .save_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         } else if self.backendconfig.savefile == PortalSelect::Kde {
-            let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopKdeProxy::new(&connection).await?;
+            let output = proxy
+                .save_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         } else {
-            let Ok(proxy) = XdgDesktopGtkProxy::new(&connection).await else {
-                return (0, SelectedFiles::default());
-            };
-            let Ok(output) = proxy.save_file(handle, app_id, parent_window, title, options).await else {
-                return (0, SelectedFiles::default());
-            };
-            output
+            let proxy = XdgDesktopGtkProxy::new(&connection).await?;
+            let output = proxy
+                .save_file(handle, app_id, parent_window, title, options)
+                .await?;
+            Ok(output)
         }
     }
+
     async fn save_files(
         &mut self,
         handle: ObjectPath<'_>,
@@ -122,38 +115,22 @@ impl Shana {
         parent_window: String,
         title: String,
         options: HashMap<String, Value<'_>>,
-    ) -> (u32, HashMap<String, OwnedValue>) {
-        let Ok(connection) = zbus::Connection::session().await else {
-            return (0, HashMap::new());
-        };
-        // INFO: only gtk and gnome have savefiles, so if not use gnome or gtk, all fallback to gtk
-        if self.backendconfig.savefile == PortalSelect::Gnome {
-            let Ok(proxy) = XdgDesktopKdeProxy::new(&connection).await else {
-                return (0, HashMap::new());
-            };
-            let Ok(output) = proxy.save_files(handle, app_id, parent_window, title, options).await else {
-                return (0, HashMap::new());
-            };
-            output
-        } else {
-            let Ok(proxy) = XdgDesktopGtkProxy::new(&connection).await else {
-                return (0, HashMap::new());
-            };
-            let Ok(output) = proxy.save_files(handle, app_id, parent_window, title, options).await else {
-                return (0, HashMap::new());
-            };
-            output
-        }
+    ) -> fdo::Result<(u32, HashMap<String, OwnedValue>)> {
+        let connection = get_connection().await?;
+        // INFO: only gtk have savefiles, so if not use gnome or gtk, all fallback to gtk
+        let proxy = XdgDesktopGtkProxy::new(&connection).await?;
+        let output = proxy
+            .save_files(handle, app_id, parent_window, title, options)
+            .await?;
+        Ok(output)
     }
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     std::env::set_var("RUST_LOG", "xdg-desktop-protal-shana=info");
-    tracing_subscriber::fmt()
-        .with_max_level(Level::INFO)
-        .finish();
-    info!("Shana Start");
+    tracing_subscriber::fmt().init();
+    tracing::info!("Shana Start");
     let config = Config::config_from_file();
     let backendconfig = ProtalConfig::from(config);
     let _conn = ConnectionBuilder::session()?
