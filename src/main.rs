@@ -33,7 +33,6 @@ struct ProtalConfig {
     openfile: PortalSelect,
 }
 
-//mod filechoosertypes;
 #[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
 impl Shana {
     async fn open_file(
