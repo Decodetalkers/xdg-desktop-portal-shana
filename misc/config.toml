@@ -1,3 +1,5 @@
 open_file = "Kde"
 save_file = "Gnome"
-open_directory = "Lxqt"
+
+[tips]
+open_file_when_folder = "Lxqt"

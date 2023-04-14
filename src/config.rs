@@ -4,7 +4,12 @@ use std::io::Read;
 pub struct Config {
     pub open_file: String,
     pub save_file: String,
-    pub open_directory: String,
+    pub tips: Tips,
+}
+
+#[derive(Deserialize, PartialEq, Eq, Debug)]
+pub struct Tips {
+    pub open_file_when_folder: String,
 }
 
 impl Config {
@@ -47,12 +52,12 @@ impl From<Option<Config>> for super::ProtalConfig {
             None => crate::ProtalConfig {
                 savefile: crate::PortalSelect::Gnome,
                 openfile: crate::PortalSelect::Gnome,
-                opendirectory : crate::PortalSelect::Gnome,
+                tips_openfilewhenfolder : crate::PortalSelect::Gnome,
             },
             Some(value) => crate::ProtalConfig {
                 savefile: value.save_file.into(),
                 openfile: value.open_file.into(),
-                opendirectory: value.open_directory.into(),
+                tips_openfilewhenfolder: value.tips.open_file_when_folder.into(),
             },
         }
     }
