@@ -28,6 +28,7 @@ struct Shana {
     backendconfig: ProtalConfig,
 }
 
+#[derive(PartialEq, Debug, Eq)]
 struct ProtalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,

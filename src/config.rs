@@ -9,7 +9,7 @@ pub struct Config {
 
 #[derive(Deserialize, PartialEq, Eq, Debug)]
 pub struct Tips {
-    pub open_file_when_folder: Option<String>,
+    pub open_file_when_folder: String,
 }
 
 impl Config {
@@ -57,15 +57,35 @@ impl From<Option<Config>> for super::ProtalConfig {
             Some(value) => crate::ProtalConfig {
                 savefile: value.save_file.clone().into(),
                 openfile: value.open_file.clone().into(),
-                openfile_casefolder: match value
-                    .tips
-                    .as_ref()
-                    .map(|tips| tips.open_file_when_folder.clone().unwrap_or_default())
-                {
-                    Some(select) => select.into(),
-                    None => value.open_file.clone().into(),
+                openfile_casefolder: match value.tips {
+                    None => value.open_file.into(),
+                    Some(v) => v.open_file_when_folder.into(),
                 },
             },
         }
     }
+}
+
+#[test]
+fn tst_toml() {
+    let config_src1 = include_str!("../misc/test/config1.toml");
+    let config1: super::ProtalConfig = Some(toml::from_str(config_src1).unwrap()).into();
+    assert_eq!(
+        config1,
+        super::ProtalConfig {
+            openfile: crate::PortalSelect::Kde,
+            savefile: crate::PortalSelect::Gnome,
+            openfile_casefolder: crate::PortalSelect::Lxqt,
+        }
+    );
+    let config_src2 = include_str!("../misc/test/config2.toml");
+    let config2: super::ProtalConfig = Some(toml::from_str(config_src2).unwrap()).into();
+    assert_eq!(
+        config2,
+        super::ProtalConfig {
+            openfile: crate::PortalSelect::Kde,
+            savefile: crate::PortalSelect::Gnome,
+            openfile_casefolder: crate::PortalSelect::Kde,
+        }
+    );
 }

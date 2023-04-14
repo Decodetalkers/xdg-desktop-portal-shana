@@ -4,7 +4,7 @@ use zbus::{
     zvariant::{ObjectPath, OwnedValue, Value},
 };
 
-#[derive(PartialEq, PartialOrd)]
+#[derive(PartialEq, PartialOrd, Eq, Debug)]
 pub enum PortalSelect {
     Kde,
     Gnome,
