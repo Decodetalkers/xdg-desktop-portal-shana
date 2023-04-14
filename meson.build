@@ -58,7 +58,7 @@ xdg_target = custom_target('xdg-deskop-portal-shana',
   command: command
 )
 
-install_data('misc/shana.portal',
+install_data('misc/adorable-shana.portal',
   install_dir: portal_dir
 )
 
