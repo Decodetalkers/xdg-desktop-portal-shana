@@ -2,8 +2,6 @@
 Description=Xdg Desktop Portal for other portal
 PartOf=graphical-session.target
 After=graphical-session.target
-# if you want to use this only with wayland
-# ConditionEnvironment=WAYLAND_DISPLAY
 
 [Service]
 Type=dbus
