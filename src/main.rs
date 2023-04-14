@@ -31,7 +31,7 @@ struct Shana {
 struct ProtalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,
-    tips_openfilewhenfolder: PortalSelect,
+    openfile_casefolder: PortalSelect,
 }
 
 #[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
@@ -46,7 +46,7 @@ impl Shana {
     ) -> fdo::Result<(u32, SelectedFiles)> {
         let connection = get_connection().await?;
         let portal_select = if let Some(true) = options.directory {
-            &self.backendconfig.tips_openfilewhenfolder
+            &self.backendconfig.openfile_casefolder
         } else {
             &self.backendconfig.openfile
         };
