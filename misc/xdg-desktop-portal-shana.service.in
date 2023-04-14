@@ -1,8 +1,7 @@
 [Unit]
-Description=Portal service (wlroots implementation)
+Description=Xdg Desktop Portal for other portal
 PartOf=graphical-session.target
 After=graphical-session.target
-ConditionEnvironment=WAYLAND_DISPLAY
 
 [Service]
 Type=dbus
