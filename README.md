@@ -22,6 +22,7 @@ write like this
 ```toml
 open_file = "Gnome"
 save_file = "Gnome"
+open_directory = "Gnome"
 ```
 
 The keyword you can use include

@@ -4,6 +4,7 @@ use std::io::Read;
 pub struct Config {
     pub open_file: String,
     pub save_file: String,
+    pub open_directory: String,
 }
 
 impl Config {
@@ -46,10 +47,12 @@ impl From<Option<Config>> for super::ProtalConfig {
             None => crate::ProtalConfig {
                 savefile: crate::PortalSelect::Gnome,
                 openfile: crate::PortalSelect::Gnome,
+                opendirectory : crate::PortalSelect::Gnome,
             },
             Some(value) => crate::ProtalConfig {
                 savefile: value.save_file.into(),
                 openfile: value.open_file.into(),
+                opendirectory: value.open_directory.into(),
             },
         }
     }

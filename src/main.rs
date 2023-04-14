@@ -31,6 +31,7 @@ struct Shana {
 struct ProtalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,
+    opendirectory: PortalSelect,
 }
 
 #[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
@@ -44,30 +45,58 @@ impl Shana {
         options: OpenFileOptions,
     ) -> fdo::Result<(u32, SelectedFiles)> {
         let connection = get_connection().await?;
-        if self.backendconfig.openfile == PortalSelect::Gnome {
-            let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else if self.backendconfig.openfile == PortalSelect::Lxqt {
-            let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else if self.backendconfig.openfile == PortalSelect::Kde {
-            let proxy = XdgDesktopKdeProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
+        if let Some(true) = options.directory  {
+            if self.backendconfig.opendirectory == PortalSelect::Gnome {
+                let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            } else if self.backendconfig.opendirectory == PortalSelect::Lxqt {
+                let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            } else if self.backendconfig.opendirectory == PortalSelect::Kde {
+                let proxy = XdgDesktopKdeProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            } else {
+                let proxy = XdgDesktopGtkProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            }
         } else {
-            let proxy = XdgDesktopGtkProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
+            if self.backendconfig.openfile == PortalSelect::Gnome {
+                let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            } else if self.backendconfig.openfile == PortalSelect::Lxqt {
+                let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            } else if self.backendconfig.openfile == PortalSelect::Kde {
+                let proxy = XdgDesktopKdeProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            } else {
+                let proxy = XdgDesktopGtkProxy::new(&connection).await?;
+                let output = proxy
+                    .open_file(handle, app_id, parent_window, title, options)
+                    .await?;
+                Ok(output)
+            }
         }
     }
 

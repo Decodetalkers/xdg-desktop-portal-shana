@@ -55,7 +55,7 @@ pub struct OpenFileOptions {
     accept_label: Option<String>, // WindowTitle
     modal: Option<bool>,          // bool
     multiple: Option<bool>,       // bool
-    directory: Option<bool>,
+    pub directory: Option<bool>,
     filters: Vec<FileFilter>, // Filter
     current_filter: Option<FileFilter>,
     choices: Option<Vec<Choice>>,
