@@ -20,8 +20,11 @@ create ~/.config/xdg-desktop-portal-shana/config.toml
 write like this
 
 ```toml
-open_file = "Gnome"
+open_file = "Kde"
 save_file = "Gnome"
+
+[tips]
+open_file_when_folder = "Lxqt"
 ```
 
 The keyword you can use include

@@ -31,6 +31,7 @@ struct Shana {
 struct ProtalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,
+    openfile_casefolder: PortalSelect,
 }
 
 #[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
@@ -44,19 +45,24 @@ impl Shana {
         options: OpenFileOptions,
     ) -> fdo::Result<(u32, SelectedFiles)> {
         let connection = get_connection().await?;
-        if self.backendconfig.openfile == PortalSelect::Gnome {
+        let portal_select = if let Some(true) = options.directory {
+            &self.backendconfig.openfile_casefolder
+        } else {
+            &self.backendconfig.openfile
+        };
+        if *portal_select == PortalSelect::Gnome {
             let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
             let output = proxy
                 .open_file(handle, app_id, parent_window, title, options)
                 .await?;
             Ok(output)
-        } else if self.backendconfig.openfile == PortalSelect::Lxqt {
+        } else if *portal_select == PortalSelect::Lxqt {
             let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
             let output = proxy
                 .open_file(handle, app_id, parent_window, title, options)
                 .await?;
             Ok(output)
-        } else if self.backendconfig.openfile == PortalSelect::Kde {
+        } else if *portal_select == PortalSelect::Kde {
             let proxy = XdgDesktopKdeProxy::new(&connection).await?;
             let output = proxy
                 .open_file(handle, app_id, parent_window, title, options)
