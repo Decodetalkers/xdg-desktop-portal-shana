@@ -2,12 +2,12 @@ project(
   'xdg-desktop-portal-shana',
   'rust',
   version: '0.3.4',
-  meson_version : '>= 0.60'
+  meson_version : '>= 1.1.0'
 )
 
-cargo = find_program('cargo', version: '>= 1.65')
+cargo = find_program('cargo', version: '>= 1.70')
 
-rustc = find_program('rustc', version: '>= 1.65')
+rustc = find_program('rustc', version: '>= 1.70')
 
 if get_option('debug')
   command = [

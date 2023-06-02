@@ -3,7 +3,6 @@ mod config;
 mod protaltypes;
 use backends::*;
 use config::Config;
-use once_cell::sync::OnceCell;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{collections::HashMap, error::Error, future::pending};
 use zbus::{
@@ -12,7 +11,9 @@ use zbus::{
     ConnectionBuilder,
 };
 
-static SESSION: OnceCell<zbus::Connection> = OnceCell::new();
+use std::sync::OnceLock;
+
+static SESSION: OnceLock<zbus::Connection> = OnceLock::new();
 
 async fn get_connection() -> zbus::Result<zbus::Connection> {
     if let Some(cnx) = SESSION.get() {
