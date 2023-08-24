@@ -41,7 +41,8 @@ impl From<String> for super::PortalSelect {
             "Gnome" => Self::Gnome,
             "Kde" => Self::Kde,
             "Lxqt" => Self::Lxqt,
-            _ => Self::Gtk,
+            "Gtk" => Self::Gtk,
+            value => Self::Other(value.to_string())
         }
     }
 }

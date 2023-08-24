@@ -36,6 +36,18 @@ struct ProtalConfig {
     openfile_casefolder: PortalSelect,
 }
 
+impl PortalSelect {
+    fn service_path(&self) -> &str {
+        match self {
+            PortalSelect::Kde => "org.freedesktop.impl.portal.desktop.kde",
+            PortalSelect::Gnome => "org.freedesktop.impl.portal.desktop.gnome",
+            PortalSelect::Lxqt => "org.freedesktop.impl.portal.desktop.lxqt",
+            PortalSelect::Gtk => "org.freedesktop.impl.portal.desktop.gtk",
+            PortalSelect::Other(path) => path,
+        }
+    }
+}
+
 #[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
 impl Shana {
     async fn open_file(
@@ -52,31 +64,16 @@ impl Shana {
         } else {
             &self.backendconfig.openfile
         };
-        if *portal_select == PortalSelect::Gnome {
-            let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else if *portal_select == PortalSelect::Lxqt {
-            let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else if *portal_select == PortalSelect::Kde {
-            let proxy = XdgDesktopKdeProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else {
-            let proxy = XdgDesktopGtkProxy::new(&connection).await?;
-            let output = proxy
-                .open_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        }
+        let portal = XdgDesktopFilePortalProxy::builder(&connection)
+            .destination(portal_select.service_path())?
+            .build()
+            .await?;
+
+        let output = portal
+            .open_file(handle, app_id, parent_window, title, options)
+            .await?;
+
+        Ok(output)
     }
 
     async fn save_file(
@@ -88,31 +85,15 @@ impl Shana {
         options: SaveFileOptions,
     ) -> fdo::Result<(u32, SelectedFiles)> {
         let connection = get_connection().await?;
-        if self.backendconfig.savefile == PortalSelect::Gnome {
-            let proxy = XdgDesktopGnomeProxy::new(&connection).await?;
-            let output = proxy
-                .save_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else if self.backendconfig.savefile == PortalSelect::Lxqt {
-            let proxy = XdgDesktopLxqtProxy::new(&connection).await?;
-            let output = proxy
-                .save_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else if self.backendconfig.savefile == PortalSelect::Kde {
-            let proxy = XdgDesktopKdeProxy::new(&connection).await?;
-            let output = proxy
-                .save_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        } else {
-            let proxy = XdgDesktopGtkProxy::new(&connection).await?;
-            let output = proxy
-                .save_file(handle, app_id, parent_window, title, options)
-                .await?;
-            Ok(output)
-        }
+        let portal = XdgDesktopFilePortalProxy::builder(&connection)
+            .destination(self.backendconfig.savefile.service_path())?
+            .build()
+            .await?;
+
+        let output = portal
+            .save_file(handle, app_id, parent_window, title, options)
+            .await?;
+        Ok(output)
     }
 
     async fn save_files(
@@ -125,8 +106,11 @@ impl Shana {
     ) -> fdo::Result<(u32, HashMap<String, OwnedValue>)> {
         let connection = get_connection().await?;
         // INFO: only gtk have savefiles, so if not use gnome or gtk, all fallback to gtk
-        let proxy = XdgDesktopGtkProxy::new(&connection).await?;
-        let output = proxy
+        let portal = XdgDesktopFilePortalProxy::builder(&connection)
+            .destination(PortalSelect::Gtk.service_path())?
+            .build()
+            .await?;
+        let output = portal
             .save_files(handle, app_id, parent_window, title, options)
             .await?;
         Ok(output)
