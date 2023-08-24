@@ -34,6 +34,15 @@ The keyword you can use include
 `Gtk`
 `Lxqt`
 
+or set
+
+```toml
+open_file = "org.freedesktop.desktop.impl.lxqt"
+save_file = "org.freedesktop.desktop.impl.lxqt"
+```
+
+the key now is allowed to set the service path
+
 ## Show
 
 ![select file](./show/choosefile.png)
