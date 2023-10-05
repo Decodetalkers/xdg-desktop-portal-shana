@@ -48,3 +48,16 @@ the key now is allowed to set the service path
 ![select file](./show/choosefile.png)
 
 ![save file](./show/savefile.png)
+
+## How to use it
+
+to use it, you need to create ~/.config/xdg-desktop-portal/CURRENT_DESKTOP_NAME-portals.conf, for example, if you name is setted as sway, you need to create sway.conf
+
+This will override the config under `/usr/share/xdg-desktop-portal/deskop-portals.conf`, it there is already one.
+
+```
+[preferred]
+default=luminous
+org.freedesktop.impl.portal.Settings=luminous;gtk
+org.freedesktop.impl.portal.FileChooser=shana
+```
