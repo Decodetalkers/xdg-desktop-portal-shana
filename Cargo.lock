@@ -1314,7 +1314,7 @@ dependencies = [
 
 [[package]]
 name = "xdg-desktop-portal-shana"
-version = "0.3.5"
+version = "0.3.6"
 dependencies = [
  "serde",
  "serde_repr",

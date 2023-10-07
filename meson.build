@@ -1,7 +1,7 @@
 project(
   'xdg-desktop-portal-shana',
   'rust',
-  version: '0.3.6',
+  version: '0.3.7',
   meson_version : '>= 1.1.0'
 )
 
@@ -58,7 +58,7 @@ xdg_target = custom_target('xdg-deskop-portal-shana',
   command: command
 )
 
-install_data('misc/adorable-shana.portal',
+install_data('misc/shana.portal',
   install_dir: portal_dir
 )
 
