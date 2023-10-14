@@ -193,7 +193,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let config_path = std::path::Path::new(home.as_str())
             .join(".config")
             .join("xdg-desktop-portal-shana");
-        async_watch(config_path).await.unwrap()
+        if let Err(e) = async_watch(config_path).await {
+            tracing::info!("Maybe config file is not exist, create one :{e}");
+        }
     });
 
     pending::<()>().await;

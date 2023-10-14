@@ -1,7 +1,7 @@
 project(
   'xdg-desktop-portal-shana',
   'rust',
-  version: '0.3.7',
+  version: '0.3.9',
   meson_version : '>= 1.1.0'
 )
 
