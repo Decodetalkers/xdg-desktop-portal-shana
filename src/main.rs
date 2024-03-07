@@ -7,7 +7,7 @@ use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 use std::{collections::HashMap, error::Error, future::pending, sync::Arc};
 use tokio::sync::Mutex;
 use zbus::{
-    dbus_interface, fdo,
+    interface, fdo,
     zvariant::{ObjectPath, OwnedValue, Value},
     ConnectionBuilder,
 };
@@ -69,7 +69,7 @@ impl PortalSelect {
     }
 }
 
-#[dbus_interface(name = "org.freedesktop.impl.portal.FileChooser")]
+#[interface(name = "org.freedesktop.impl.portal.FileChooser")]
 impl Shana {
     async fn open_file(
         &mut self,
