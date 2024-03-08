@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use zbus::{
-    dbus_proxy,
+    proxy,
     zvariant::{ObjectPath, OwnedValue, Value},
 };
 
@@ -14,7 +14,7 @@ pub enum PortalSelect {
 }
 use crate::protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
 
-#[dbus_proxy(
+#[proxy(
     interface = "org.freedesktop.impl.portal.FileChooser",
     default_path = "/org/freedesktop/portal/desktop"
 )]
