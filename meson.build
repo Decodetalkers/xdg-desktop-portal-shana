@@ -49,7 +49,7 @@ dbus_service_file = configure_file(
   configuration: global_conf
 )
 
-xdg_target = custom_target('xdg-deskop-portal-shana',
+xdg_target = custom_target('xdg-desktop-portal-shana',
   output: 'xdg-desktop-portal-shana',
   build_by_default: true,
   install: true,
