@@ -1,14 +1,55 @@
-use std::path::Path;
+use std::{
+    ffi::{CString, OsStr},
+    os::unix::ffi::OsStrExt,
+    path::Path,
+};
 
 use serde::{Deserialize, Serialize};
 use serde_repr::Serialize_repr;
 use zbus::zvariant::{DeserializeDict, SerializeDict, Type};
+
+/// A file name represented as a nul-terminated byte array.
+#[derive(Type, Debug, Default, PartialEq)]
+#[zvariant(signature = "ay")]
+pub struct FilePath(CString);
+
+impl AsRef<Path> for FilePath {
+    fn as_ref(&self) -> &Path {
+        OsStr::from_bytes(self.0.as_bytes()).as_ref()
+    }
+}
+
+impl Serialize for FilePath {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_bytes(self.0.as_bytes_with_nul())
+    }
+}
+
+impl<'de> Deserialize<'de> for FilePath {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let bytes = <Vec<u8>>::deserialize(deserializer)?;
+        let c_string = CString::from_vec_with_nul(bytes)
+            .map_err(|_| serde::de::Error::custom("Bytes are not nul-terminated"))?;
+
+        Ok(Self(c_string))
+    }
+}
+
 // SelectedFiles
 #[derive(SerializeDict, DeserializeDict, Type, Debug, Default)]
 #[zvariant(signature = "dict")]
 pub struct SelectedFiles {
     pub uris: Vec<url::Url>,
     pub choices: Option<Vec<(String, String)>>,
+    pub current_filter: Option<FileFilter>,
+    // Only relavant for OpenFile
+    pub writable: Option<bool>,
 }
 
 #[allow(dead_code)]
@@ -21,6 +62,8 @@ impl SelectedFiles {
                 .filter_map(|urlunit| urlunit.ok())
                 .collect(),
             choices: None,
+            current_filter: None,
+            writable: None,
         }
     }
 }
@@ -105,6 +148,6 @@ pub struct SaveFileOptions {
     current_filter: Option<FileFilter>,
     choices: Option<Vec<Choice>>,
     current_name: Option<String>,
-    current_folder: Option<Vec<u8>>,
-    current_file: Option<Vec<u8>>,
+    current_folder: Option<FilePath>,
+    current_file: Option<FilePath>,
 }
