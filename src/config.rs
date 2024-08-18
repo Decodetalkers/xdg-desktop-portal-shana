@@ -39,20 +39,27 @@ impl From<String> for super::PortalSelect {
             "Kde" => Self::Kde,
             "Lxqt" => Self::Lxqt,
             "Gtk" => Self::Gtk,
+            "Native" => Self::Native,
             value => Self::Other(value.to_string()),
         }
     }
 }
 
-impl From<Option<Config>> for super::ProtalConfig {
+impl super::PortalSelect {
+    pub fn is_native(&self) -> bool {
+        matches!(self, Self::Native)
+    }
+}
+
+impl From<Option<Config>> for super::PortalConfig {
     fn from(value: Option<Config>) -> Self {
         match value {
-            None => crate::ProtalConfig {
+            None => crate::PortalConfig {
                 savefile: crate::PortalSelect::Gnome,
                 openfile: crate::PortalSelect::Gnome,
                 openfile_casefolder: crate::PortalSelect::Gnome,
             },
-            Some(value) => crate::ProtalConfig {
+            Some(value) => crate::PortalConfig {
                 savefile: value.save_file.clone().into(),
                 openfile: value.open_file.clone().into(),
                 openfile_casefolder: match value.tips {
@@ -67,20 +74,20 @@ impl From<Option<Config>> for super::ProtalConfig {
 #[test]
 fn tst_toml() {
     let config_src1 = include_str!("../misc/test/config1.toml");
-    let config1: super::ProtalConfig = Some(toml::from_str(config_src1).unwrap()).into();
+    let config1: super::PortalConfig = Some(toml::from_str(config_src1).unwrap()).into();
     assert_eq!(
         config1,
-        super::ProtalConfig {
+        super::PortalConfig {
             openfile: crate::PortalSelect::Kde,
             savefile: crate::PortalSelect::Gnome,
             openfile_casefolder: crate::PortalSelect::Lxqt,
         }
     );
     let config_src2 = include_str!("../misc/test/config2.toml");
-    let config2: super::ProtalConfig = Some(toml::from_str(config_src2).unwrap()).into();
+    let config2: super::PortalConfig = Some(toml::from_str(config_src2).unwrap()).into();
     assert_eq!(
         config2,
-        super::ProtalConfig {
+        super::PortalConfig {
             openfile: crate::PortalSelect::Kde,
             savefile: crate::PortalSelect::Gnome,
             openfile_casefolder: crate::PortalSelect::Kde,

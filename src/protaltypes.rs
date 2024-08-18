@@ -1,5 +1,6 @@
 use std::{
     ffi::{CString, OsStr},
+    fmt::Display,
     os::unix::ffi::OsStrExt,
     path::Path,
 };
@@ -9,7 +10,7 @@ use serde_repr::Serialize_repr;
 use zbus::zvariant::{DeserializeDict, SerializeDict, Type};
 
 /// A file name represented as a nul-terminated byte array.
-#[derive(Type, Debug, Default, PartialEq)]
+#[derive(Type, Debug, Default, PartialEq, Clone)]
 #[zvariant(signature = "ay")]
 pub struct FilePath(CString);
 
@@ -42,7 +43,7 @@ impl<'de> Deserialize<'de> for FilePath {
 }
 
 // SelectedFiles
-#[derive(SerializeDict, DeserializeDict, Type, Debug, Default)]
+#[derive(SerializeDict, DeserializeDict, Type, Debug, Default, Clone)]
 #[zvariant(signature = "dict")]
 pub struct SelectedFiles {
     pub uris: Vec<url::Url>,
@@ -67,27 +68,168 @@ impl SelectedFiles {
         }
     }
 }
-#[derive(Clone, Serialize, Deserialize, Type, Debug)]
-/// Presents the user with a choice to select from or as a checkbox.
-pub struct Choice(String, String, Vec<(String, String)>, String);
-
-#[derive(Clone, Serialize_repr, Deserialize, Debug, Type)]
+#[derive(Clone, Serialize_repr, Deserialize, Debug, Type, PartialEq, Eq)]
 #[repr(u32)]
 pub enum FilterType {
     GlobPattern = 0,
     MimeType = 1,
 }
 
-#[derive(Clone, Serialize, Deserialize, Type, Debug)]
+impl FilterType {
+    /// Whether it is a mime type filter.
+    fn is_mimetype(&self) -> bool {
+        matches!(self, FilterType::MimeType)
+    }
+
+    /// Whether it is a glob pattern type filter.
+    fn is_pattern(&self) -> bool {
+        matches!(self, FilterType::GlobPattern)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Type)]
 pub struct FileFilter(String, Vec<(FilterType, String)>);
 
-#[allow(dead_code)]
 impl FileFilter {
-    pub fn get_filters(&self) -> Vec<(FilterType, String)> {
-        self.1.clone()
+    pub fn title(&self) -> &str {
+        &self.0
     }
-    pub fn get_name(&self) -> String {
-        self.0.clone()
+
+    pub fn get_filters(&self) -> &[(FilterType, String)] {
+        &self.1
+    }
+}
+
+impl FileFilter {
+    /// Create a new file filter
+    ///
+    /// # Arguments
+    ///
+    /// * `label` - user-visible name of the file filter.
+    pub fn new(label: &str) -> Self {
+        Self(label.to_owned(), vec![])
+    }
+
+    /// Adds a mime type to the file filter.
+    #[must_use]
+    pub fn mimetype(mut self, mimetype: &str) -> Self {
+        self.1.push((FilterType::MimeType, mimetype.to_owned()));
+        self
+    }
+
+    /// Adds a glob pattern to the file filter.
+    #[must_use]
+    pub fn glob(mut self, pattern: &str) -> Self {
+        self.1.push((FilterType::GlobPattern, pattern.to_owned()));
+        self
+    }
+
+    #[allow(unused)]
+    pub(crate) fn filters(&self) -> &Vec<(FilterType, String)> {
+        &self.1
+    }
+}
+
+impl Default for FileFilter {
+    fn default() -> Self {
+        Self("All files: (*)".to_string(), Vec::new())
+    }
+}
+
+impl Display for FileFilter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut display_info = format!("{} :", self.0.clone());
+
+        for (_, show) in self.1.iter() {
+            display_info.push_str(&format!(" {}", show));
+        }
+        write!(f, "{}", display_info)
+    }
+}
+
+impl FileFilter {
+    /// The label of the filter.
+    pub fn label(&self) -> &str {
+        &self.0
+    }
+
+    /// List of mimetypes filters.
+    pub fn mimetype_filters(&self) -> Vec<&str> {
+        self.1
+            .iter()
+            .filter_map(|(type_, string)| type_.is_mimetype().then_some(string.as_str()))
+            .collect()
+    }
+
+    /// List of glob patterns filters.
+    pub fn pattern_filters(&self) -> Vec<&str> {
+        self.1
+            .iter()
+            .filter_map(|(type_, string)| type_.is_pattern().then_some(string.as_str()))
+            .collect()
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, Type)]
+/// Presents the user with a choice to select from or as a checkbox.
+pub struct Choice(String, String, Vec<(String, String)>, String);
+
+impl Choice {
+    /// Creates a checkbox choice.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - A unique identifier of the choice.
+    /// * `label` - user-visible name of the choice.
+    /// * `state` - the initial state value.
+    pub fn boolean(id: &str, label: &str, state: bool) -> Self {
+        Self::new(id, label, &state.to_string())
+    }
+
+    /// Creates a new choice.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - A unique identifier of the choice.
+    /// * `label` - user-visible name of the choice.
+    /// * `initial_selection` - the initially selected value.
+    pub fn new(id: &str, label: &str, initial_selection: &str) -> Self {
+        Self(
+            id.to_owned(),
+            label.to_owned(),
+            vec![],
+            initial_selection.to_owned(),
+        )
+    }
+
+    /// Adds a (key, value) as a choice.
+    #[must_use]
+    pub fn insert(mut self, key: &str, value: &str) -> Self {
+        self.2.push((key.to_owned(), value.to_owned()));
+        self
+    }
+
+    /// The choice's unique id
+    pub fn id(&self) -> &str {
+        &self.0
+    }
+
+    /// The user visible label of the choice.
+    pub fn label(&self) -> &str {
+        &self.1
+    }
+
+    /// Pairs of choices.
+    pub fn pairs(&self) -> Vec<(&str, &str)> {
+        self.2
+            .iter()
+            .map(|(x, y)| (x.as_str(), y.as_str()))
+            .collect::<Vec<_>>()
+    }
+
+    /// The initially selected value.
+    pub fn initial_selection(&self) -> &str {
+        &self.3
     }
 }
 
@@ -95,14 +237,14 @@ impl FileFilter {
 #[derive(SerializeDict, DeserializeDict, Type, Debug)]
 #[zvariant(signature = "dict")]
 pub struct OpenFileOptions {
-    accept_label: Option<String>,
-    modal: Option<bool>,
-    multiple: Option<bool>,
+    pub accept_label: Option<String>, // WindowTitle
+    pub modal: Option<bool>,          // bool
+    pub multiple: Option<bool>,       // bool
     pub directory: Option<bool>,
-    filters: Option<Vec<FileFilter>>,
-    current_filter: Option<FileFilter>,
-    choices: Option<Vec<Choice>>,
-    current_folder: Option<FilePath>,
+    pub filters: Option<Vec<FileFilter>>, // Filter
+    pub current_filter: Option<FileFilter>,
+    pub choices: Option<Vec<Choice>>,
+    pub current_folder: Option<FilePath>,
 }
 
 #[allow(dead_code)]
@@ -142,15 +284,15 @@ pub enum SelectFunction {
 #[derive(SerializeDict, DeserializeDict, Type, Debug)]
 #[zvariant(signature = "dict")]
 pub struct SaveFileOptions {
-    accept_label: Option<String>,
-    modal: Option<bool>,
-    multiple: Option<bool>,
-    filters: Option<Vec<FileFilter>>,
-    current_filter: Option<FileFilter>,
-    choices: Option<Vec<Choice>>,
-    current_name: Option<String>,
-    current_folder: Option<FilePath>,
-    current_file: Option<FilePath>,
+    pub accept_label: Option<String>, // String
+    pub modal: Option<bool>,          // bool
+    pub multiple: Option<bool>,       // bool
+    pub filters: Vec<FileFilter>,
+    pub current_filter: Option<FileFilter>,
+    pub choices: Option<Vec<Choice>>,
+    pub current_name: Option<String>,
+    pub current_folder: Option<FilePath>,
+    pub current_file: Option<FilePath>,
 }
 
 #[derive(DeserializeDict, SerializeDict, Type, Debug)]

@@ -6,7 +6,12 @@ use config::Config;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
 use std::{error::Error, future::pending, sync::Arc};
 use tokio::sync::Mutex;
-use zbus::{fdo, interface, zvariant::ObjectPath, ConnectionBuilder};
+use zbus::{
+    fdo, interface,
+    zvariant::{ObjectPath, OwnedValue, Value},
+    ConnectionBuilder,
+};
+mod shana_chooser;
 
 use std::sync::OnceLock;
 
@@ -19,17 +24,17 @@ use futures::{
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 
-static SETTING_CONFIG: Lazy<Arc<Mutex<ProtalConfig>>> =
-    Lazy::new(|| Arc::new(Mutex::new(ProtalConfig::from(Config::config_from_file()))));
+static SETTING_CONFIG: Lazy<Arc<Mutex<PortalConfig>>> =
+    Lazy::new(|| Arc::new(Mutex::new(PortalConfig::from(Config::config_from_file()))));
 
-async fn get_setting_config() -> ProtalConfig {
+async fn get_setting_config() -> PortalConfig {
     let config = SETTING_CONFIG.lock().await;
     config.clone()
 }
 
 async fn update_setting_config() {
     let mut config = SETTING_CONFIG.lock().await;
-    *config = ProtalConfig::from(Config::config_from_file());
+    *config = PortalConfig::from(Config::config_from_file());
 }
 
 static SESSION: OnceLock<zbus::Connection> = OnceLock::new();
@@ -47,7 +52,7 @@ async fn get_connection() -> zbus::Result<zbus::Connection> {
 struct Shana;
 
 #[derive(PartialEq, Debug, Eq, Clone)]
-struct ProtalConfig {
+struct PortalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,
     openfile_casefolder: PortalSelect,
@@ -61,6 +66,7 @@ impl PortalSelect {
             PortalSelect::Lxqt => "org.freedesktop.impl.portal.desktop.lxqt",
             PortalSelect::Gtk => "org.freedesktop.impl.portal.desktop.gtk",
             PortalSelect::Other(path) => path,
+            PortalSelect::Native => unreachable!(),
         }
     }
 }
@@ -74,9 +80,12 @@ impl Shana {
         parent_window: String,
         title: String,
         options: OpenFileOptions,
-    ) -> fdo::Result<(u32, SelectedFiles)> {
-        let connection = get_connection().await?;
+    ) -> fdo::Result<PortalResponse<SelectedFiles>> {
         let backendconfig = get_setting_config().await;
+        if backendconfig.openfile.is_native() {
+            return Ok(shana_chooser::open_file_native(options));
+        }
+        let connection = get_connection().await?;
         let portal_select = if let Some(true) = options.directory {
             backendconfig.openfile_casefolder
         } else {
@@ -101,7 +110,7 @@ impl Shana {
         parent_window: String,
         title: String,
         options: SaveFileOptions,
-    ) -> fdo::Result<(u32, SelectedFiles)> {
+    ) -> fdo::Result<PortalResponse<SelectedFiles>> {
         let connection = get_connection().await?;
         let backendconfig = get_setting_config().await;
         let portal = XdgDesktopFilePortalProxy::builder(&connection)
