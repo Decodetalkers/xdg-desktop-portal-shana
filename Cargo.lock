@@ -1509,7 +1509,7 @@ dependencies = [
 
 [[package]]
 name = "xdg-desktop-portal-shana"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "futures",
  "notify",
