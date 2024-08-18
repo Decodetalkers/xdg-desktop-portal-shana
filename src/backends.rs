@@ -1,4 +1,8 @@
-use zbus::{proxy, zvariant::ObjectPath};
+use serde::{Deserialize, Serialize};
+use zbus::{
+    proxy,
+    zvariant::{self, ObjectPath},
+};
 
 #[derive(PartialEq, PartialOrd, Eq, Debug, Clone)]
 pub enum PortalSelect {
@@ -6,9 +10,18 @@ pub enum PortalSelect {
     Gnome,
     Lxqt,
     Gtk,
+    Native,
     Other(String),
 }
 use crate::protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
+
+#[derive(zvariant::Type, Deserialize, Serialize, Clone, Copy)]
+#[zvariant(signature = "(ua{sv})")]
+pub enum PortalResponse<T: zvariant::Type + serde::Serialize> {
+    Success(T),
+    Cancelled,
+    Other,
+}
 
 #[proxy(
     interface = "org.freedesktop.impl.portal.FileChooser",
@@ -22,7 +35,7 @@ trait XdgDesktopFilePortal {
         parent_window: String,
         title: String,
         options: OpenFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
+    ) -> zbus::Result<PortalResponse<SelectedFiles>>;
     fn save_file(
         &self,
         handle: ObjectPath<'_>,
@@ -30,7 +43,7 @@ trait XdgDesktopFilePortal {
         parent_window: String,
         title: String,
         options: SaveFileOptions,
-    ) -> zbus::Result<(u32, SelectedFiles)>;
+    ) -> zbus::Result<PortalResponse<SelectedFiles>>;
     fn save_files(
         &self,
         handle: ObjectPath<'_>,
