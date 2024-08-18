@@ -1,8 +1,4 @@
-use std::collections::HashMap;
-use zbus::{
-    proxy,
-    zvariant::{ObjectPath, OwnedValue, Value},
-};
+use zbus::{proxy, zvariant::ObjectPath};
 
 #[derive(PartialEq, PartialOrd, Eq, Debug, Clone)]
 pub enum PortalSelect {
@@ -12,7 +8,7 @@ pub enum PortalSelect {
     Gtk,
     Other(String),
 }
-use crate::protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
+use crate::protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
 
 #[proxy(
     interface = "org.freedesktop.impl.portal.FileChooser",
@@ -41,6 +37,6 @@ trait XdgDesktopFilePortal {
         app_id: String,
         parent_window: String,
         title: String,
-        options: HashMap<String, Value<'_>>,
-    ) -> zbus::Result<(u32, HashMap<String, OwnedValue>)>;
+        options: SaveFilesOptions,
+    ) -> zbus::Result<(u32, SelectedFiles)>;
 }

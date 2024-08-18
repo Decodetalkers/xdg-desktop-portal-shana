@@ -95,13 +95,14 @@ impl FileFilter {
 #[derive(SerializeDict, DeserializeDict, Type, Debug)]
 #[zvariant(signature = "dict")]
 pub struct OpenFileOptions {
-    accept_label: Option<String>, // WindowTitle
-    modal: Option<bool>,          // bool
-    multiple: Option<bool>,       // bool
+    accept_label: Option<String>,
+    modal: Option<bool>,
+    multiple: Option<bool>,
     pub directory: Option<bool>,
-    filters: Vec<FileFilter>, // Filter
+    filters: Option<Vec<FileFilter>>,
     current_filter: Option<FileFilter>,
     choices: Option<Vec<Choice>>,
+    current_folder: Option<FilePath>,
 }
 
 #[allow(dead_code)]
@@ -110,13 +111,13 @@ impl OpenFileOptions {
         if let Some(true) = self.directory {
             SelectFunction::Folder {
                 title: self.accept_label.clone().unwrap_or("OpenFold".to_string()),
-                filters: self.filters.clone(),
+                filters: self.filters.as_ref().unwrap_or(&vec![]).clone(),
                 current_filter: self.current_filter.clone(),
             }
         } else {
             SelectFunction::File {
                 title: self.accept_label.clone().unwrap_or("OpenFile".to_string()),
-                filters: self.filters.clone(),
+                filters: (self.filters.as_ref().unwrap_or(&vec![])).clone(),
                 current_filter: self.current_filter.clone(),
             }
         }
@@ -141,13 +142,23 @@ pub enum SelectFunction {
 #[derive(SerializeDict, DeserializeDict, Type, Debug)]
 #[zvariant(signature = "dict")]
 pub struct SaveFileOptions {
-    accept_label: Option<String>, // String
-    modal: Option<bool>,          // bool
-    multiple: Option<bool>,       // bool
-    filters: Vec<FileFilter>,
+    accept_label: Option<String>,
+    modal: Option<bool>,
+    multiple: Option<bool>,
+    filters: Option<Vec<FileFilter>>,
     current_filter: Option<FileFilter>,
     choices: Option<Vec<Choice>>,
     current_name: Option<String>,
     current_folder: Option<FilePath>,
     current_file: Option<FilePath>,
+}
+
+#[derive(DeserializeDict, SerializeDict, Type, Debug)]
+#[zvariant(signature = "dict")]
+pub struct SaveFilesOptions {
+    accept_label: Option<String>,
+    modal: Option<bool>,
+    choices: Option<Vec<Choice>>,
+    current_folder: Option<FilePath>,
+    files: Option<Vec<FilePath>>,
 }

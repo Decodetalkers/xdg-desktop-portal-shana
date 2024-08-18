@@ -3,14 +3,10 @@ mod config;
 mod protaltypes;
 use backends::*;
 use config::Config;
-use protaltypes::{OpenFileOptions, SaveFileOptions, SelectedFiles};
-use std::{collections::HashMap, error::Error, future::pending, sync::Arc};
+use protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
+use std::{error::Error, future::pending, sync::Arc};
 use tokio::sync::Mutex;
-use zbus::{
-    interface, fdo,
-    zvariant::{ObjectPath, OwnedValue, Value},
-    ConnectionBuilder,
-};
+use zbus::{fdo, interface, zvariant::ObjectPath, ConnectionBuilder};
 
 use std::sync::OnceLock;
 
@@ -125,8 +121,8 @@ impl Shana {
         app_id: String,
         parent_window: String,
         title: String,
-        options: HashMap<String, Value<'_>>,
-    ) -> fdo::Result<(u32, HashMap<String, OwnedValue>)> {
+        options: SaveFilesOptions,
+    ) -> fdo::Result<(u32, SelectedFiles)> {
         let connection = get_connection().await?;
         // INFO: only gtk have savefiles, so if not use gnome or gtk, all fallback to gtk
         let portal = XdgDesktopFilePortalProxy::builder(&connection)
