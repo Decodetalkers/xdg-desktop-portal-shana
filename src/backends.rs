@@ -14,7 +14,7 @@ use crate::protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, Sel
     interface = "org.freedesktop.impl.portal.FileChooser",
     default_path = "/org/freedesktop/portal/desktop"
 )]
-trait XdgDesktopFilePortal {
+pub trait XdgDesktopFilePortal {
     fn open_file(
         &self,
         handle: ObjectPath<'_>,

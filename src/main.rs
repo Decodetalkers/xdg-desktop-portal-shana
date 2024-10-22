@@ -6,11 +6,11 @@ use config::Config;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
 use std::{error::Error, future::pending, sync::Arc};
 use tokio::sync::Mutex;
-use zbus::{fdo, interface, zvariant::ObjectPath, ConnectionBuilder};
+use zbus::{connection, fdo, interface, zvariant::ObjectPath};
 
 use std::sync::OnceLock;
 
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
 
 use futures::{
     channel::mpsc::{channel, Receiver},
@@ -19,8 +19,8 @@ use futures::{
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 
-static SETTING_CONFIG: Lazy<Arc<Mutex<ProtalConfig>>> =
-    Lazy::new(|| Arc::new(Mutex::new(ProtalConfig::from(Config::config_from_file()))));
+static SETTING_CONFIG: LazyLock<Arc<Mutex<ProtalConfig>>> =
+    LazyLock::new(|| Arc::new(Mutex::new(ProtalConfig::from(Config::config_from_file()))));
 
 async fn get_setting_config() -> ProtalConfig {
     let config = SETTING_CONFIG.lock().await;
@@ -177,7 +177,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     std::env::set_var("RUST_LOG", "xdg-desktop-protal-shana=info");
     tracing_subscriber::fmt().init();
     tracing::info!("Shana Start");
-    let _conn = ConnectionBuilder::session()?
+    let _conn = connection::Builder::session()?
         .name("org.freedesktop.impl.portal.desktop.shana")?
         .serve_at("/org/freedesktop/portal/desktop", Shana)?
         .build()
