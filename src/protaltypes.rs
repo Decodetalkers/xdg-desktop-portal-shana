@@ -48,7 +48,7 @@ pub struct SelectedFiles {
     pub uris: Vec<url::Url>,
     pub choices: Option<Vec<(String, String)>>,
     pub current_filter: Option<FileFilter>,
-    // Only relavant for OpenFile
+    // Only relevant for OpenFile
     pub writable: Option<bool>,
 }
 

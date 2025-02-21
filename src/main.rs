@@ -13,8 +13,8 @@ use std::sync::OnceLock;
 use std::sync::LazyLock;
 
 use futures::{
-    channel::mpsc::{channel, Receiver},
     SinkExt, StreamExt,
+    channel::mpsc::{Receiver, channel},
 };
 use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
@@ -174,7 +174,7 @@ async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    std::env::set_var("RUST_LOG", "xdg-desktop-protal-shana=info");
+    unsafe { std::env::set_var("RUST_LOG", "xdg-desktop-protal-shana=info") };
     tracing_subscriber::fmt().init();
     tracing::info!("Shana Start");
     let _conn = connection::Builder::session()?
