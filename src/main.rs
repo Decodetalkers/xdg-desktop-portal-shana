@@ -3,6 +3,7 @@ mod config;
 mod protaltypes;
 use backends::*;
 use config::Config;
+use notify::EventKind;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
 use std::{error::Error, future::pending, sync::Arc};
 use tokio::sync::Mutex;
@@ -162,10 +163,18 @@ async fn async_watch<P: AsRef<Path>>(path: P) -> notify::Result<()> {
 
     while let Some(res) = rx.next().await {
         match res {
-            Ok(_) => {
+            Ok(Event {
+                kind: EventKind::Modify(_),
+                ..
+            })
+            | Ok(Event {
+                kind: EventKind::Create(_),
+                ..
+            }) => {
                 update_setting_config().await;
             }
             Err(e) => println!("watch error: {:?}", e),
+            _ => {}
         }
     }
 
