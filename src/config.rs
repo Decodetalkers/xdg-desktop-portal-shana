@@ -4,6 +4,7 @@ use std::io::Read;
 pub struct Config {
     pub open_file: String,
     pub save_file: String,
+    pub save_files: Option<String>,
     pub tips: Option<Tips>,
 }
 
@@ -48,13 +49,15 @@ impl From<Option<Config>> for super::ProtalConfig {
     fn from(value: Option<Config>) -> Self {
         match value {
             None => crate::ProtalConfig {
-                savefile: crate::PortalSelect::Gnome,
-                openfile: crate::PortalSelect::Gnome,
-                openfile_casefolder: crate::PortalSelect::Gnome,
+                savefile: crate::PortalSelect::Gtk,
+                openfile: crate::PortalSelect::Gtk,
+                savefiles: crate::PortalSelect::Gtk,
+                openfile_casefolder: crate::PortalSelect::Gtk,
             },
             Some(value) => crate::ProtalConfig {
-                savefile: value.save_file.clone().into(),
+                savefile: value.save_file.into(),
                 openfile: value.open_file.clone().into(),
+                savefiles: value.save_files.unwrap_or("Gtk".to_string()).into(),
                 openfile_casefolder: match value.tips {
                     None => value.open_file.into(),
                     Some(v) => v.open_file_when_folder.into(),
@@ -73,6 +76,7 @@ fn tst_toml() {
         super::ProtalConfig {
             openfile: crate::PortalSelect::Kde,
             savefile: crate::PortalSelect::Gnome,
+            savefiles: crate::PortalSelect::Gtk,
             openfile_casefolder: crate::PortalSelect::Lxqt,
         }
     );
@@ -83,6 +87,7 @@ fn tst_toml() {
         super::ProtalConfig {
             openfile: crate::PortalSelect::Kde,
             savefile: crate::PortalSelect::Gnome,
+            savefiles: crate::PortalSelect::Gtk,
             openfile_casefolder: crate::PortalSelect::Kde,
         }
     );

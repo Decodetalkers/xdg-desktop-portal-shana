@@ -51,6 +51,7 @@ struct Shana;
 struct ProtalConfig {
     savefile: PortalSelect,
     openfile: PortalSelect,
+    savefiles: PortalSelect,
     openfile_casefolder: PortalSelect,
 }
 
@@ -58,7 +59,7 @@ impl PortalSelect {
     fn service_path(&self) -> &str {
         match self {
             PortalSelect::Kde => "org.freedesktop.impl.portal.desktop.kde",
-            PortalSelect::Gnome => "org.freedesktop.impl.portal.desktop.gnome",
+            PortalSelect::Gnome => "org.gnome.Nautilus",
             PortalSelect::Lxqt => "org.freedesktop.impl.portal.desktop.lxqt",
             PortalSelect::Gtk => "org.freedesktop.impl.portal.desktop.gtk",
             PortalSelect::Other(path) => path,
@@ -125,9 +126,10 @@ impl Shana {
         options: SaveFilesOptions,
     ) -> fdo::Result<(u32, SelectedFiles)> {
         let connection = get_connection().await?;
+        let backendconfig = get_setting_config().await;
         // INFO: only gtk have savefiles, so if not use gnome or gtk, all fallback to gtk
         let portal = XdgDesktopFilePortalProxy::builder(&connection)
-            .destination(PortalSelect::Gtk.service_path())?
+            .destination(backendconfig.savefiles.service_path())?
             .build()
             .await?;
         let output = portal

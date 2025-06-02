@@ -39,6 +39,7 @@ or set
 ```toml
 open_file = "org.freedesktop.desktop.impl.lxqt"
 save_file = "org.freedesktop.desktop.impl.lxqt"
+save_files = "Gnome"
 ```
 
 the key now is allowed to set the service path
