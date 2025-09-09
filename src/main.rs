@@ -70,7 +70,7 @@ impl PortalSelect {
 #[interface(name = "org.freedesktop.impl.portal.FileChooser")]
 impl Shana {
     async fn open_file(
-        &mut self,
+        &self,
         handle: ObjectPath<'_>,
         app_id: String,
         parent_window: String,
@@ -97,7 +97,7 @@ impl Shana {
     }
 
     async fn save_file(
-        &mut self,
+        &self,
         handle: ObjectPath<'_>,
         app_id: String,
         parent_window: String,
@@ -118,7 +118,7 @@ impl Shana {
     }
 
     async fn save_files(
-        &mut self,
+        &self,
         handle: ObjectPath<'_>,
         app_id: String,
         parent_window: String,
