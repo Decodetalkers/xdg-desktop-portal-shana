@@ -1390,7 +1390,7 @@ checksum = "ea2f10b9bb0928dfb1b42b65e1f9e36f7f54dbdf08457afefb38afcdec4fa2bb"
 
 [[package]]
 name = "xdg-desktop-portal-shana"
-version = "0.3.15"
+version = "0.3.16"
 dependencies = [
  "futures",
  "notify",
