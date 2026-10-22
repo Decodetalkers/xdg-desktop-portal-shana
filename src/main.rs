@@ -7,7 +7,7 @@ use notify::EventKind;
 use protaltypes::{OpenFileOptions, SaveFileOptions, SaveFilesOptions, SelectedFiles};
 use std::{error::Error, future::pending, sync::Arc};
 use tokio::sync::Mutex;
-use zbus::{connection, fdo, interface, zvariant::ObjectPath};
+use zbus::{ObjectPath, connection, fdo, interface};
 
 use std::sync::OnceLock;
 
@@ -85,7 +85,7 @@ impl Shana {
             backendconfig.openfile
         };
         let portal = XdgDesktopFilePortalProxy::builder(&connection)
-            .destination(portal_select.service_path())?
+            .destination(portal_select.service_path())
             .build()
             .await?;
 
@@ -107,7 +107,7 @@ impl Shana {
         let connection = get_connection().await?;
         let backendconfig = get_setting_config().await;
         let portal = XdgDesktopFilePortalProxy::builder(&connection)
-            .destination(backendconfig.savefile.service_path())?
+            .destination(backendconfig.savefile.service_path())
             .build()
             .await?;
 
@@ -129,7 +129,7 @@ impl Shana {
         let backendconfig = get_setting_config().await;
         // INFO: only gtk have savefiles, so if not use gnome or gtk, all fallback to gtk
         let portal = XdgDesktopFilePortalProxy::builder(&connection)
-            .destination(backendconfig.savefiles.service_path())?
+            .destination(backendconfig.savefiles.service_path())
             .build()
             .await?;
         let output = portal
@@ -188,9 +188,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     unsafe { std::env::set_var("RUST_LOG", "xdg-desktop-protal-shana=info") };
     tracing_subscriber::fmt().init();
     tracing::info!("Shana Start");
-    let _conn = connection::Builder::session()?
-        .name("org.freedesktop.impl.portal.desktop.shana")?
-        .serve_at("/org/freedesktop/portal/desktop", Shana)?
+    let _conn = connection::Builder::session()
+        .name("org.freedesktop.impl.portal.desktop.shana")
+        .serve_at("/org/freedesktop/portal/desktop", Shana)
         .build()
         .await?;
     tokio::spawn(async move {

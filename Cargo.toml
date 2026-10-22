@@ -1,12 +1,20 @@
 [package]
 name = "xdg-desktop-portal-shana"
-version = "0.3.16"
+version = "0.3.17"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-zbus = { version = "5", default-features = false, features = ["tokio", "url"] }
+zbus = { version = "6", default-features = false, features = [
+	"tokio",
+	"url",
+	"proxy",
+	"service",
+	"object-manager",
+	"tracing",
+] }
+
 tokio = { version = "1.52.1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 tracing = "0.1.41"

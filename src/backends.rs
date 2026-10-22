@@ -1,4 +1,4 @@
-use zbus::{proxy, zvariant::ObjectPath};
+use zbus::{ObjectPath, proxy};
 
 #[derive(PartialEq, PartialOrd, Eq, Debug, Clone)]
 pub enum PortalSelect {
