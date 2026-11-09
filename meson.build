@@ -42,13 +42,13 @@ global_conf = configuration_data()
 
 global_conf.set('xdg_install_dir', xdg_install_dir)
 
-configure_file(
+systemd_file = configure_file(
   input: 'misc/xdg-desktop-portal-shana.service.in',
   output: 'xdg-desktop-portal-shana.service',
   configuration: global_conf,
 )
 
-configure_file(
+dbus_file = configure_file(
   input: 'misc/org.freedesktop.impl.portal.desktop.shana.service.in',
   output: 'org.freedesktop.impl.portal.desktop.shana.service',
   configuration: global_conf,
@@ -67,11 +67,11 @@ custom_target(
 install_data('misc/shana.portal', install_dir: portal_dir)
 
 install_data(
-  meson.project_build_root() / 'org.freedesktop.impl.portal.desktop.shana.service',
+  dbus_file,
   install_dir: dbus1_dir,
 )
 
 install_data(
-  meson.project_build_root() / 'xdg-desktop-portal-shana.service',
+  systemd_file,
   install_dir: system_dir,
 )
